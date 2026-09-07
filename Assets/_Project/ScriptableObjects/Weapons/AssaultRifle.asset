@@ -18,3 +18,7 @@ MonoBehaviour:
   range: 30
   recoilDistance: 0.04
   recoilAngle: 2.5
+  damage: 20
+  fireMode: 0
+  pelletCount: 1
+  spreadAngle: 0

@@ -15,6 +15,7 @@ public sealed class WeaponDefinition : ScriptableObject
     [SerializeField, Min(0.1f)] private float range = 30f;
     [SerializeField, Min(0f)] private float recoilDistance = 0.04f;
     [SerializeField, Min(0f)] private float recoilAngle = 2.5f;
+    [SerializeField, Min(0f)] private float damage = 20f;
     [SerializeField] private WeaponFireMode fireMode = WeaponFireMode.Automatic;
     [SerializeField, Range(1, 8)] private int pelletCount = 1;
     [SerializeField, Range(0f, 30f)] private float spreadAngle;
@@ -25,6 +26,7 @@ public sealed class WeaponDefinition : ScriptableObject
     public float Range => range;
     public float RecoilDistance => recoilDistance;
     public float RecoilAngle => recoilAngle;
+    public float Damage => damage;
     public WeaponFireMode FireMode => fireMode;
     public int PelletCount => pelletCount;
     public float SpreadAngle => spreadAngle;

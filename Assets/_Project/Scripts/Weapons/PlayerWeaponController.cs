@@ -104,7 +104,11 @@ public sealed class PlayerWeaponController : MonoBehaviour
             Vector3 direction = GetPelletDirection(forward, definition.SpreadAngle);
             Vector3 endpoint = slot.muzzle.position + direction * definition.Range;
             if (Physics.Raycast(slot.muzzle.position, direction, out RaycastHit hit, definition.Range, ~0, QueryTriggerInteraction.Ignore))
+            {
                 endpoint = hit.point;
+                IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
+                damageable?.TakeDamage(definition.Damage);
+            }
             PelletEndpoints[i] = endpoint;
         }
 
