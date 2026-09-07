@@ -23,6 +23,7 @@ public sealed class ZombieAI : MonoBehaviour
     private State state;
     private float nextPathTime;
     private float nextAttackTime;
+    private Vector3 knockbackVelocity;
 
     public bool IsDead => state == State.Dead;
 
@@ -53,6 +54,15 @@ public sealed class ZombieAI : MonoBehaviour
     {
         if (state == State.Dead || target == null)
             return;
+
+        if (knockbackVelocity.sqrMagnitude > 0.001f && agent.isOnNavMesh)
+        {
+            agent.Move(knockbackVelocity * Time.deltaTime);
+            knockbackVelocity = Vector3.MoveTowards(
+                knockbackVelocity,
+                Vector3.zero,
+                10f * Time.deltaTime);
+        }
 
         Vector3 targetPosition = target.position;
         Vector3 offset = targetPosition - transform.position;
@@ -95,6 +105,14 @@ public sealed class ZombieAI : MonoBehaviour
             nextAttackTime = Time.time + attackCooldown;
             // Player damage is intentionally deferred; this is the M7 melee timing foundation.
         }
+    }
+
+    public void ApplyExplosionKnockback(Vector3 impulse)
+    {
+        if (state == State.Dead)
+            return;
+        impulse.y = 0f;
+        knockbackVelocity += impulse;
     }
 
     private void Die()
