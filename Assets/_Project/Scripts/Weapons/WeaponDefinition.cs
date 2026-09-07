@@ -1,0 +1,19 @@
+using UnityEngine;
+
+[CreateAssetMenu(menuName = "Project/Weapons/Weapon Definition")]
+public sealed class WeaponDefinition : ScriptableObject
+{
+    [SerializeField] private string weaponId = "assault_rifle";
+    [SerializeField] private string displayName = "Assault Rifle";
+    [SerializeField, Min(0.01f)] private float fireRate = 8f;
+    [SerializeField, Min(0.1f)] private float range = 30f;
+    [SerializeField, Min(0f)] private float recoilDistance = 0.04f;
+    [SerializeField, Min(0f)] private float recoilAngle = 2.5f;
+
+    public string WeaponId => weaponId;
+    public string DisplayName => displayName;
+    public float FireRate => fireRate;
+    public float Range => range;
+    public float RecoilDistance => recoilDistance;
+    public float RecoilAngle => recoilAngle;
+}
