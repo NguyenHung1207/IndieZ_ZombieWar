@@ -5,21 +5,31 @@ public sealed class GameHUD : MonoBehaviour
 {
     [SerializeField] private Text healthText;
     [SerializeField] private Text timerText;
+    [SerializeField] private Text weaponText;
+    [SerializeField] private Image healthFill;
     [SerializeField] private Text resultText;
     [SerializeField] private GameObject resultPanel;
+    [SerializeField] private GameObject mobileControls;
     [SerializeField] private Button restartButton;
 
     private GameSession session;
     private PlayerHealth playerHealth;
+    private PlayerWeaponController weaponController;
 
     private void Start()
     {
         session = GameSession.Instance;
         playerHealth = FindFirstObjectByType<PlayerHealth>();
+        weaponController = FindFirstObjectByType<PlayerWeaponController>();
         if (session != null)
             session.StateChanged += HandleStateChanged;
         if (restartButton != null && session != null)
             restartButton.onClick.AddListener(session.RestartLevel);
+        if (weaponController != null)
+        {
+            weaponController.WeaponChanged += HandleWeaponChanged;
+            HandleWeaponChanged(weaponController.EquippedWeapon);
+        }
         HandleStateChanged(session != null ? session.State : GameSessionState.Playing);
     }
 
@@ -32,6 +42,8 @@ public sealed class GameHUD : MonoBehaviour
         }
         if (playerHealth != null && healthText != null)
             healthText.text = string.Format("HP  {0:000}", Mathf.CeilToInt(playerHealth.CurrentHealth));
+        if (playerHealth != null && healthFill != null)
+            healthFill.fillAmount = playerHealth.MaxHealth > 0f ? playerHealth.CurrentHealth / playerHealth.MaxHealth : 0f;
     }
 
     private void HandleStateChanged(GameSessionState state)
@@ -39,14 +51,24 @@ public sealed class GameHUD : MonoBehaviour
         bool ended = state != GameSessionState.Playing;
         if (resultPanel != null)
             resultPanel.SetActive(ended);
+        if (mobileControls != null)
+            mobileControls.SetActive(!ended);
         if (resultText != null)
             resultText.text = state == GameSessionState.Victory ? "VICTORY" : "GAME OVER";
+    }
+
+    private void HandleWeaponChanged(WeaponDefinition definition)
+    {
+        if (weaponText != null)
+            weaponText.text = definition != null ? definition.DisplayName.ToUpperInvariant() : "WEAPON";
     }
 
     private void OnDestroy()
     {
         if (session != null)
             session.StateChanged -= HandleStateChanged;
+        if (weaponController != null)
+            weaponController.WeaponChanged -= HandleWeaponChanged;
         if (restartButton != null && session != null)
             restartButton.onClick.RemoveListener(session.RestartLevel);
     }

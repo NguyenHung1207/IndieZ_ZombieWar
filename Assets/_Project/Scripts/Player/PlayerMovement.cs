@@ -5,11 +5,20 @@ public sealed class PlayerMovement : MonoBehaviour
 {
     [SerializeField, Min(0f)] private float moveSpeed = 5f;
     [SerializeField, Min(0f)] private float rotationSpeed = 720f;
+    [SerializeField] private VirtualJoystick mobileJoystick;
 
     public float MoveSpeed => moveSpeed;
 
     private CharacterController characterController;
     private float verticalVelocity;
+    private Vector2 externalMoveInput;
+    private bool externalInputActive;
+
+    public void SetMoveInput(Vector2 input)
+    {
+        externalMoveInput = Vector2.ClampMagnitude(input, 1f);
+        externalInputActive = externalMoveInput.sqrMagnitude >= 0.0144f;
+    }
 
     private void Awake()
     {
@@ -20,10 +29,11 @@ public sealed class PlayerMovement : MonoBehaviour
     {
         if (GameSession.Instance != null && !GameSession.Instance.IsPlaying)
             return;
-        Vector3 input = new Vector3(
-            Input.GetAxisRaw("Horizontal"),
-            0f,
-            Input.GetAxisRaw("Vertical"));
+        Vector2 desktopInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        Vector2 selectedInput = mobileJoystick != null && mobileJoystick.IsDragging
+            ? mobileJoystick.Value
+            : externalInputActive ? externalMoveInput : desktopInput;
+        Vector3 input = new Vector3(selectedInput.x, 0f, selectedInput.y);
         Vector3 moveDirection = Vector3.ClampMagnitude(input, 1f);
 
         if (moveDirection.sqrMagnitude > 0f)

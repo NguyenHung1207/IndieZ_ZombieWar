@@ -22,6 +22,8 @@ public sealed class PlayerWeaponController : MonoBehaviour
     private static readonly Vector3[] PelletEndpoints = new Vector3[8];
     private PlayerAnimationController playerAnimationController;
     private bool fireHeld;
+    private bool desktopFireHeld;
+    private bool mobileFireHeld;
     private bool semiAutomaticShotConsumed;
     private float nextFireTime;
     private int currentWeaponIndex;
@@ -29,6 +31,7 @@ public sealed class PlayerWeaponController : MonoBehaviour
     public int CurrentWeaponIndex => currentWeaponIndex;
     public int WeaponCount => weapons != null ? weapons.Length : 0;
     public WeaponDefinition EquippedWeapon => GetCurrentSlot()?.definition;
+    public event Action<WeaponDefinition> WeaponChanged;
 
     private void Awake()
     {
@@ -37,6 +40,7 @@ public sealed class PlayerWeaponController : MonoBehaviour
             combatAudio = GetComponent<CombatAudio>();
         currentWeaponIndex = Mathf.Clamp(startingWeaponIndex, 0, Mathf.Max(0, WeaponCount - 1));
         ApplyActiveWeapon();
+        WeaponChanged?.Invoke(EquippedWeapon);
     }
 
     private void Update()
@@ -49,7 +53,7 @@ public sealed class PlayerWeaponController : MonoBehaviour
             return;
         }
 
-        SetFireHeld(Input.GetMouseButton(0));
+        SetDesktopFireHeld(Input.GetMouseButton(0));
         WeaponDefinition definition = EquippedWeapon;
         if (!fireHeld || definition == null)
             return;
@@ -63,9 +67,15 @@ public sealed class PlayerWeaponController : MonoBehaviour
 
     public void SetFireHeld(bool held)
     {
-        fireHeld = held;
-        if (!held)
-            semiAutomaticShotConsumed = false;
+        mobileFireHeld = held;
+        UpdateFireHeldState();
+    }
+
+    public void StopInput()
+    {
+        desktopFireHeld = false;
+        mobileFireHeld = false;
+        UpdateFireHeldState();
     }
 
     public void SwitchWeapon()
@@ -80,10 +90,11 @@ public sealed class PlayerWeaponController : MonoBehaviour
         if (weapons == null || index < 0 || index >= weapons.Length || index == currentWeaponIndex)
             return;
 
-        SetFireHeld(false);
+        StopInput();
         currentWeaponIndex = index;
         nextFireTime = Time.time;
         ApplyActiveWeapon();
+        WeaponChanged?.Invoke(EquippedWeapon);
     }
 
     public bool TryFire()
@@ -131,6 +142,20 @@ public sealed class PlayerWeaponController : MonoBehaviour
         return weapons != null && currentWeaponIndex >= 0 && currentWeaponIndex < weapons.Length
             ? weapons[currentWeaponIndex]
             : null;
+    }
+
+    private void SetDesktopFireHeld(bool held)
+    {
+        desktopFireHeld = held;
+        UpdateFireHeldState();
+    }
+
+    private void UpdateFireHeldState()
+    {
+        bool nextFireHeld = desktopFireHeld || mobileFireHeld;
+        if (fireHeld && !nextFireHeld)
+            semiAutomaticShotConsumed = false;
+        fireHeld = nextFireHeld;
     }
 
     private void ApplyActiveWeapon()

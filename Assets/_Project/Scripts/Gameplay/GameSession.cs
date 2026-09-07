@@ -91,7 +91,10 @@ public sealed class GameSession : MonoBehaviour
         foreach (PlayerMovement movement in FindObjectsByType<PlayerMovement>(FindObjectsSortMode.None))
             movement.enabled = false;
         foreach (PlayerWeaponController weapons in FindObjectsByType<PlayerWeaponController>(FindObjectsSortMode.None))
+        {
+            weapons.StopInput();
             weapons.enabled = false;
+        }
         foreach (PlayerGrenadeController grenades in FindObjectsByType<PlayerGrenadeController>(FindObjectsSortMode.None))
             grenades.enabled = false;
     }
