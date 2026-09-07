@@ -104,6 +104,11 @@ public sealed class GameSession : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().path);
     }
 
+    public void ReturnToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
+
     private void OnDestroy()
     {
         if (playerHealth != null)

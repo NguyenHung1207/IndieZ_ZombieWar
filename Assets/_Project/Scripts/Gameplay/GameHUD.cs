@@ -11,6 +11,7 @@ public sealed class GameHUD : MonoBehaviour
     [SerializeField] private GameObject resultPanel;
     [SerializeField] private GameObject mobileControls;
     [SerializeField] private Button restartButton;
+    [SerializeField] private Button mainMenuButton;
 
     private GameSession session;
     private PlayerHealth playerHealth;
@@ -25,6 +26,8 @@ public sealed class GameHUD : MonoBehaviour
             session.StateChanged += HandleStateChanged;
         if (restartButton != null && session != null)
             restartButton.onClick.AddListener(session.RestartLevel);
+        if (mainMenuButton != null && session != null)
+            mainMenuButton.onClick.AddListener(session.ReturnToMainMenu);
         if (weaponController != null)
         {
             weaponController.WeaponChanged += HandleWeaponChanged;
@@ -71,5 +74,7 @@ public sealed class GameHUD : MonoBehaviour
             weaponController.WeaponChanged -= HandleWeaponChanged;
         if (restartButton != null && session != null)
             restartButton.onClick.RemoveListener(session.RestartLevel);
+        if (mainMenuButton != null && session != null)
+            mainMenuButton.onClick.RemoveListener(session.ReturnToMainMenu);
     }
 }
