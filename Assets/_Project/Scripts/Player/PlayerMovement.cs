@@ -6,6 +6,8 @@ public sealed class PlayerMovement : MonoBehaviour
     [SerializeField, Min(0f)] private float moveSpeed = 5f;
     [SerializeField, Min(0f)] private float rotationSpeed = 720f;
 
+    public float MoveSpeed => moveSpeed;
+
     private CharacterController characterController;
     private float verticalVelocity;
 

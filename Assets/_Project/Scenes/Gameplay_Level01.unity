@@ -540,6 +540,7 @@ GameObject:
   - component: {fileID: 400000002}
   - component: {fileID: 400000006}
   - component: {fileID: 400000007}
+  - component: {fileID: 400000008}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -602,6 +603,20 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   moveSpeed: 5
   rotationSpeed: 720
+--- !u!114 &400000008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 400000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a6a6cc0c4d74bb8b9c9a2f8b7f940f1, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimationController
+  animator: {fileID: 1871874631}
+  parameterDampTime: 0.1
 --- !u!1 &861645598
 GameObject:
   m_ObjectHideFlags: 0
@@ -802,6 +817,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2333246135476635897, guid: bae3b6da9f558a04994badd5424cbd6f, type: 3}
+      propertyPath: m_Controller
+      value:
+      objectReference: {fileID: 9100000, guid: ebfa6890251cfe14c981a5c6800851cc, type: 2}
+    - target: {fileID: 2333246135476635897, guid: bae3b6da9f558a04994badd5424cbd6f, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
       objectReference: {fileID: 0}
@@ -889,6 +908,11 @@ PrefabInstance:
 --- !u!4 &1871874630 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2333246135476635896, guid: bae3b6da9f558a04994badd5424cbd6f, type: 3}
+  m_PrefabInstance: {fileID: 1871874629}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1871874631 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 2333246135476635897, guid: bae3b6da9f558a04994badd5424cbd6f, type: 3}
   m_PrefabInstance: {fileID: 1871874629}
   m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
