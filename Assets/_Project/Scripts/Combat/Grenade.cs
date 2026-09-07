@@ -47,6 +47,7 @@ public sealed class Grenade : MonoBehaviour
             visual.SetActive(false);
 
         ApplyExplosionDamage();
+        CombatAudio.PlayAt(transform.position, CombatSound.GrenadeExplosion, 0.9f);
         if (explosionPrefab != null)
         {
             ParticleSystem effect = Instantiate(explosionPrefab, transform.position, Quaternion.identity);

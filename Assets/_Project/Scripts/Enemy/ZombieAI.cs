@@ -25,6 +25,9 @@ public sealed class ZombieAI : MonoBehaviour
     private float nextPathTime;
     private float nextAttackTime;
     private Vector3 knockbackVelocity;
+    private ZombieAnimationController animationController;
+    private CombatAudio combatAudio;
+    private float nextVoiceTime;
 
     public bool IsDead => state == State.Dead;
 
@@ -48,6 +51,9 @@ public sealed class ZombieAI : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         health = GetComponent<ZombieHealth>();
         health.Died += Die;
+        health.Hit += HandleHit;
+        animationController = GetComponent<ZombieAnimationController>();
+        combatAudio = GetComponent<CombatAudio>();
 
         agent.speed = moveSpeed;
         agent.stoppingDistance = attackRange;
@@ -55,6 +61,7 @@ public sealed class ZombieAI : MonoBehaviour
         agent.acceleration = 12f;
         agent.autoBraking = true;
         state = State.Chase;
+        nextVoiceTime = Time.time + Random.Range(6f, 12f);
     }
 
     private void Start()
@@ -72,6 +79,12 @@ public sealed class ZombieAI : MonoBehaviour
             return;
         if (GameSession.Instance != null && !GameSession.Instance.IsPlaying)
             return;
+
+        if (combatAudio != null && Time.time >= nextVoiceTime)
+        {
+            combatAudio.Play(CombatSound.ZombieVoice, 0.3f);
+            nextVoiceTime = Time.time + Random.Range(8f, 16f);
+        }
 
         if (knockbackVelocity.sqrMagnitude > 0.001f && agent.isOnNavMesh)
         {
@@ -121,6 +134,7 @@ public sealed class ZombieAI : MonoBehaviour
         if (Time.time >= nextAttackTime)
         {
             nextAttackTime = Time.time + attackCooldown;
+            animationController?.PlayAttack();
             IDamageable damageable = target.GetComponent<PlayerHealth>();
             damageable?.TakeDamage(attackDamage);
         }
@@ -149,15 +163,32 @@ public sealed class ZombieAI : MonoBehaviour
         foreach (Collider collider in GetComponentsInChildren<Collider>())
             collider.enabled = false;
 
-        if (cleanupDelay <= 0f)
+        animationController?.PlayDeath();
+        combatAudio?.Play(CombatSound.ZombieDeath, 0.75f);
+
+        ZombieDissolve dissolve = GetComponent<ZombieDissolve>();
+        if (dissolve != null)
+            dissolve.Begin();
+        else if (cleanupDelay <= 0f)
             Destroy(gameObject);
         else
             Destroy(gameObject, cleanupDelay);
     }
 
+    private void HandleHit()
+    {
+        if (state == State.Dead)
+            return;
+        animationController?.PlayHit();
+        combatAudio?.Play(CombatSound.ZombieHit, 0.45f);
+    }
+
     private void OnDestroy()
     {
         if (health != null)
+        {
             health.Died -= Die;
+            health.Hit -= HandleHit;
+        }
     }
 }

@@ -17,6 +17,7 @@ public sealed class PlayerWeaponController : MonoBehaviour
 {
     [SerializeField] private WeaponSlot[] weapons;
     [SerializeField, Min(0)] private int startingWeaponIndex;
+    [SerializeField] private CombatAudio combatAudio;
 
     private static readonly Vector3[] PelletEndpoints = new Vector3[8];
     private PlayerAnimationController playerAnimationController;
@@ -32,6 +33,8 @@ public sealed class PlayerWeaponController : MonoBehaviour
     private void Awake()
     {
         playerAnimationController = GetComponent<PlayerAnimationController>();
+        if (combatAudio == null)
+            combatAudio = GetComponent<CombatAudio>();
         currentWeaponIndex = Mathf.Clamp(startingWeaponIndex, 0, Mathf.Max(0, WeaponCount - 1));
         ApplyActiveWeapon();
     }
@@ -101,6 +104,7 @@ public sealed class PlayerWeaponController : MonoBehaviour
 
         slot.recoil?.Configure(definition.RecoilDistance, definition.RecoilAngle);
         slot.muzzleFlash?.Play(true);
+        combatAudio?.Play(definition.PelletCount > 1 ? CombatSound.ShotgunShot : CombatSound.RifleShot, 0.65f);
 
         int pelletCount = Mathf.Clamp(definition.PelletCount, 1, PelletEndpoints.Length);
         Vector3 forward = transform.forward;
