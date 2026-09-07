@@ -38,6 +38,8 @@ public sealed class PlayerWeaponController : MonoBehaviour
 
     private void Update()
     {
+        if (GameSession.Instance != null && !GameSession.Instance.IsPlaying)
+            return;
         if (Input.GetKeyDown(KeyCode.Q))
         {
             SwitchWeapon();
@@ -83,6 +85,9 @@ public sealed class PlayerWeaponController : MonoBehaviour
 
     public bool TryFire()
     {
+        if (GameSession.Instance != null && !GameSession.Instance.IsPlaying)
+            return false;
+
         WeaponSlot slot = GetCurrentSlot();
         WeaponDefinition definition = slot?.definition;
         if (slot == null || definition == null || slot.muzzle == null || playerAnimationController == null

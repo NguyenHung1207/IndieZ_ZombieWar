@@ -16,6 +16,7 @@ public sealed class ZombieAI : MonoBehaviour
     [SerializeField, Min(0.1f)] private float moveSpeed = 3f;
     [SerializeField, Min(0.1f)] private float attackRange = 1.5f;
     [SerializeField, Min(0.1f)] private float attackCooldown = 1.2f;
+    [SerializeField, Min(0.1f)] private float attackDamage = 12f;
     [SerializeField, Min(0f)] private float cleanupDelay = 2f;
 
     private NavMeshAgent agent;
@@ -26,6 +27,21 @@ public sealed class ZombieAI : MonoBehaviour
     private Vector3 knockbackVelocity;
 
     public bool IsDead => state == State.Dead;
+
+    public void SetTarget(Transform newTarget)
+    {
+        target = newTarget;
+    }
+
+    public void StopForGameEnd()
+    {
+        if (agent != null && agent.isOnNavMesh)
+        {
+            agent.isStopped = true;
+            agent.ResetPath();
+        }
+        enabled = false;
+    }
 
     private void Awake()
     {
@@ -53,6 +69,8 @@ public sealed class ZombieAI : MonoBehaviour
     private void Update()
     {
         if (state == State.Dead || target == null)
+            return;
+        if (GameSession.Instance != null && !GameSession.Instance.IsPlaying)
             return;
 
         if (knockbackVelocity.sqrMagnitude > 0.001f && agent.isOnNavMesh)
@@ -103,7 +121,8 @@ public sealed class ZombieAI : MonoBehaviour
         if (Time.time >= nextAttackTime)
         {
             nextAttackTime = Time.time + attackCooldown;
-            // Player damage is intentionally deferred; this is the M7 melee timing foundation.
+            IDamageable damageable = target.GetComponent<PlayerHealth>();
+            damageable?.TakeDamage(attackDamage);
         }
     }
 

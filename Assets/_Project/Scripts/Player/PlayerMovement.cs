@@ -18,6 +18,8 @@ public sealed class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (GameSession.Instance != null && !GameSession.Instance.IsPlaying)
+            return;
         Vector3 input = new Vector3(
             Input.GetAxisRaw("Horizontal"),
             0f,

@@ -55,7 +55,7 @@ public sealed class ZombieHealth : MonoBehaviour, IDamageable
 
     public void TakeDamage(float amount)
     {
-        if (IsDead || amount <= 0f)
+        if (IsDead || amount <= 0f || (GameSession.Instance != null && !GameSession.Instance.IsPlaying))
             return;
 
         currentHealth = Mathf.Max(0f, currentHealth - amount);

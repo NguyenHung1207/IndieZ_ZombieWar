@@ -12,12 +12,17 @@ public sealed class PlayerGrenadeController : MonoBehaviour
 
     private void Update()
     {
+        if (GameSession.Instance != null && !GameSession.Instance.IsPlaying)
+            return;
         if (Input.GetKeyDown(KeyCode.G))
             ThrowGrenade();
     }
 
     public void ThrowGrenade()
     {
+        if (GameSession.Instance != null && !GameSession.Instance.IsPlaying)
+            return;
+
         if (grenadePrefab == null || throwPoint == null || Time.time < nextThrowTime)
             return;
 
