@@ -5,6 +5,7 @@ using UnityEngine;
 public sealed class PlayerAnimationController : MonoBehaviour
 {
     private static readonly int MoveSpeedHash = Animator.StringToHash("MoveSpeed");
+    private static readonly int ShootHash = Animator.StringToHash("Shoot");
 
     [SerializeField] private Animator animator;
     [SerializeField, Min(0f)] private float parameterDampTime = 0.1f;
@@ -50,5 +51,15 @@ public sealed class PlayerAnimationController : MonoBehaviour
             normalizedSpeed,
             parameterDampTime,
             Time.deltaTime);
+    }
+
+    public void PlayShoot()
+    {
+        if (animator == null)
+        {
+            return;
+        }
+
+        animator.SetTrigger(ShootHash);
     }
 }
