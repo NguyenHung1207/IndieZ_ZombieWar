@@ -818,7 +818,7 @@ Animator:
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
-  m_WarningMessage:
+  m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -1569,6 +1569,7 @@ GameObject:
   - component: {fileID: 5837675277686704061}
   - component: {fileID: 7397817189846852851}
   - component: {fileID: 4603376434132264788}
+  - component: {fileID: 1764805083141699845}
   m_Layer: 0
   m_Name: Zombie
   m_TagString: Untagged
@@ -1647,7 +1648,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 34427ac08e1fbd343a5cb8e807cca319, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieHealth
   maxHealth: 100
   hitFlashDuration: 0.08
@@ -1663,7 +1664,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5e59c040e33482441ac579e2e4c27e82, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieAI
   target: {fileID: 0}
   moveSpeed: 3
@@ -1681,7 +1682,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2077086d1be469a4492fba0e577de9c2, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieAnimationController
 --- !u!114 &5837675277686704061
 MonoBehaviour:
@@ -1693,7 +1694,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 058e31242cf99244095be29aadf0cfba, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieDissolve
   startDelay: 0.7
   duration: 1
@@ -1806,8 +1807,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4de5d15d7f486c4abd74bb5c8a8af45, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatAudio
+--- !u!114 &1764805083141699845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6146411747811612437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9577b24b472de844c85bf75cfeb6b402, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootDropper
+  coinPrefab: {fileID: 3855305426609868514, guid: 5e4fa2503ee44704790858b2bd91729a, type: 3}
+  medkitPrefab: {fileID: 5401069892236753602, guid: f48efae84ea4e384d9762d71da5c7fcb, type: 3}
+  coinDropChance: 1
+  minimumCoinValue: 1
+  maximumCoinValue: 3
+  medkitDropChance: 0.1
 --- !u!1 &6387402773643039732
 GameObject:
   m_ObjectHideFlags: 0

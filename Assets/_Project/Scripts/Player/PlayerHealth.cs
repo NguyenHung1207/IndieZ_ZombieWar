@@ -31,4 +31,10 @@ public sealed class PlayerHealth : MonoBehaviour, IDamageable
             Died?.Invoke();
         }
     }
+
+    public void Heal(float amount)
+    {
+        if (IsDead || amount <= 0f) return;
+        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
+    }
 }
