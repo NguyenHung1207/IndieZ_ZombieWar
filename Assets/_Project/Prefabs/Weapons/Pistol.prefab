@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: -805959276040964406, guid: 4df3ce82db8e66645afd54ab1d5b0262, type: 3}
+    - target: {fileID: 1969534466077064526, guid: 25d027e626679ce468265e4919d2930c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 2918155902623411387, guid: 25d027e626679ce468265e4919d2930c, type: 3}
       propertyPath: m_Name
       value: pistol1
@@ -63,6 +67,26 @@ PrefabInstance:
     - target: {fileID: 7477875008017480055, guid: 25d027e626679ce468265e4919d2930c, type: 3}
       propertyPath: m_Name
       value: Pistol
+      objectReference: {fileID: 0}
+    - target: {fileID: 8029237217758842983, guid: 25d027e626679ce468265e4919d2930c, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 8029237217758842983, guid: 25d027e626679ce468265e4919d2930c, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 8029237217758842983, guid: 25d027e626679ce468265e4919d2930c, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 8029237217758842983, guid: 25d027e626679ce468265e4919d2930c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 8029237217758842983, guid: 25d027e626679ce468265e4919d2930c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.05
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

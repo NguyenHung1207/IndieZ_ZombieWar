@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: -4157798734872115665, guid: 60d91f925d8c1e442bb6596dfb94ffff, type: 3}
+    - target: {fileID: 1969534466077064526, guid: 25d027e626679ce468265e4919d2930c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.72
+      objectReference: {fileID: 0}
     - target: {fileID: 2918155902623411387, guid: 25d027e626679ce468265e4919d2930c, type: 3}
       propertyPath: m_Name
       value: sniper1
@@ -63,6 +67,22 @@ PrefabInstance:
     - target: {fileID: 7477875008017480055, guid: 25d027e626679ce468265e4919d2930c, type: 3}
       propertyPath: m_Name
       value: Sniper
+      objectReference: {fileID: 0}
+    - target: {fileID: 8029237217758842983, guid: 25d027e626679ce468265e4919d2930c, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 8029237217758842983, guid: 25d027e626679ce468265e4919d2930c, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 8029237217758842983, guid: 25d027e626679ce468265e4919d2930c, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 8029237217758842983, guid: 25d027e626679ce468265e4919d2930c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.03
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
