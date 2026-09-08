@@ -8,6 +8,7 @@ public sealed class PlayerHealth : MonoBehaviour, IDamageable
     private float currentHealth;
 
     public event Action Died;
+    public event Action<float, float, float> Damaged;
     public float CurrentHealth => currentHealth;
     public float MaxHealth => maxHealth;
     public bool IsDead { get; private set; }
@@ -23,6 +24,7 @@ public sealed class PlayerHealth : MonoBehaviour, IDamageable
             return;
 
         currentHealth = Mathf.Max(0f, currentHealth - amount);
+        Damaged?.Invoke(currentHealth, maxHealth, amount);
         if (currentHealth <= 0f)
         {
             IsDead = true;

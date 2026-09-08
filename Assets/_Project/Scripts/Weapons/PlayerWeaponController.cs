@@ -10,6 +10,8 @@ public sealed class WeaponSlot
     public WeaponRecoil recoil;
     public ParticleSystem muzzleFlash;
     public WeaponTracer tracer;
+    [NonSerialized] public int currentAmmo;
+    [NonSerialized] public bool isReloading;
 }
 
 [RequireComponent(typeof(PlayerAnimationController))]
@@ -18,6 +20,7 @@ public sealed class PlayerWeaponController : MonoBehaviour
     [SerializeField] private WeaponSlot[] weapons;
     [SerializeField, Min(0)] private int startingWeaponIndex;
     [SerializeField] private CombatAudio combatAudio;
+    [SerializeField] private GameObject zombieBulletImpactPrefab;
 
     private static readonly Vector3[] PelletEndpoints = new Vector3[8];
     private PlayerAnimationController playerAnimationController;
@@ -28,11 +31,16 @@ public sealed class PlayerWeaponController : MonoBehaviour
     private bool semiAutomaticShotConsumed;
     private float nextFireTime;
     private int currentWeaponIndex;
+    private Coroutine reloadCoroutine;
 
     public int CurrentWeaponIndex => currentWeaponIndex;
     public int WeaponCount => weapons != null ? weapons.Length : 0;
     public WeaponDefinition EquippedWeapon => GetCurrentSlot()?.definition;
     public event Action<WeaponDefinition> WeaponChanged;
+    public event Action<WeaponDefinition, int, int, bool> AmmoChanged;
+    public int CurrentAmmo => GetCurrentSlot()?.currentAmmo ?? 0;
+    public int CurrentMagazineSize => EquippedWeapon != null ? EquippedWeapon.MagazineSize : 0;
+    public bool IsReloading => GetCurrentSlot()?.isReloading ?? false;
 
     private void Awake()
     {
@@ -41,8 +49,10 @@ public sealed class PlayerWeaponController : MonoBehaviour
         if (combatAudio == null)
             combatAudio = GetComponent<CombatAudio>();
         currentWeaponIndex = Mathf.Clamp(startingWeaponIndex, 0, Mathf.Max(0, WeaponCount - 1));
+        InitializeAmmo();
         ApplyActiveWeapon();
         WeaponChanged?.Invoke(EquippedWeapon);
+        NotifyAmmoChanged();
     }
 
     private void Update()
@@ -57,6 +67,8 @@ public sealed class PlayerWeaponController : MonoBehaviour
             SwitchWeapon();
             return;
         }
+        if (Input.GetKeyDown(KeyCode.R))
+            Reload();
 
         SetDesktopFireHeld(Input.GetMouseButton(0));
         WeaponDefinition definition = EquippedWeapon;
@@ -69,7 +81,7 @@ public sealed class PlayerWeaponController : MonoBehaviour
 
         WeaponSlot currentSlot = GetCurrentSlot();
         autoAim?.SetAimOrigin(currentSlot?.muzzle);
-        autoAim?.RefreshTarget();
+        autoAim?.RefreshTarget(definition.Range);
         autoAim?.RotateTowardTarget(true);
 
         if (definition.FireMode == WeaponFireMode.Automatic || !semiAutomaticShotConsumed)
@@ -91,6 +103,7 @@ public sealed class PlayerWeaponController : MonoBehaviour
         mobileFireHeld = false;
         UpdateFireHeldState();
         autoAim?.ClearTarget();
+        CancelReload();
     }
 
     public void SwitchWeapon()
@@ -110,6 +123,20 @@ public sealed class PlayerWeaponController : MonoBehaviour
         nextFireTime = Time.time;
         ApplyActiveWeapon();
         WeaponChanged?.Invoke(EquippedWeapon);
+        NotifyAmmoChanged();
+    }
+
+    public void Reload()
+    {
+        if (GameSession.Instance != null && !GameSession.Instance.IsPlaying)
+            return;
+
+        WeaponSlot slot = GetCurrentSlot();
+        WeaponDefinition definition = slot?.definition;
+        if (slot == null || definition == null || slot.isReloading || slot.currentAmmo >= definition.MagazineSize)
+            return;
+
+        reloadCoroutine = StartCoroutine(ReloadRoutine(slot, definition));
     }
 
     public bool TryFire()
@@ -125,7 +152,17 @@ public sealed class PlayerWeaponController : MonoBehaviour
             return false;
         }
 
+        if (slot.isReloading)
+            return false;
+        if (slot.currentAmmo <= 0)
+        {
+            Reload();
+            return false;
+        }
+
         nextFireTime = Time.time + 1f / definition.FireRate;
+        slot.currentAmmo--;
+        NotifyAmmoChanged();
         playerAnimationController.PlayShoot();
 
         slot.recoil?.Configure(definition.RecoilDistance, definition.RecoilAngle);
@@ -135,8 +172,13 @@ public sealed class PlayerWeaponController : MonoBehaviour
         int pelletCount = Mathf.Clamp(definition.PelletCount, 1, PelletEndpoints.Length);
         Vector3 forward = transform.forward;
         autoAim?.SetAimOrigin(slot.muzzle);
-        if (autoAim != null && autoAim.TryGetAimDirection(slot.muzzle, out Vector3 assistedDirection))
-            forward = assistedDirection;
+        if (autoAim != null)
+        {
+            autoAim.RefreshTarget(definition.Range);
+            autoAim.SnapTowardTarget();
+            if (autoAim.TryGetAimDirection(slot.muzzle, out Vector3 assistedDirection))
+                forward = assistedDirection;
+        }
         Vector3 right = Vector3.Cross(Vector3.up, forward).normalized;
         Vector3 up = Vector3.Cross(forward, right).normalized;
         for (int i = 0; i < pelletCount; i++)
@@ -148,6 +190,8 @@ public sealed class PlayerWeaponController : MonoBehaviour
                 endpoint = hit.point;
                 IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
                 damageable?.TakeDamage(definition.Damage);
+                if (hit.collider.GetComponentInParent<ZombieHealth>() != null)
+                    SpawnZombieImpact(hit.point, hit.normal);
             }
             PelletEndpoints[i] = endpoint;
         }
@@ -187,6 +231,68 @@ public sealed class PlayerWeaponController : MonoBehaviour
             if (weapons[i]?.weaponObject != null)
                 weapons[i].weaponObject.SetActive(i == currentWeaponIndex);
         }
+    }
+
+    private void InitializeAmmo()
+    {
+        if (weapons == null)
+            return;
+        foreach (WeaponSlot slot in weapons)
+        {
+            if (slot?.definition == null)
+                continue;
+            slot.currentAmmo = slot.definition.MagazineSize;
+            slot.isReloading = false;
+        }
+    }
+
+    private System.Collections.IEnumerator ReloadRoutine(WeaponSlot slot, WeaponDefinition definition)
+    {
+        slot.isReloading = true;
+        NotifyAmmoChanged();
+        yield return new WaitForSeconds(definition.ReloadDuration);
+        if (slot != null && slot.definition == definition)
+        {
+            slot.currentAmmo = definition.MagazineSize;
+            slot.isReloading = false;
+            if (slot == GetCurrentSlot())
+                NotifyAmmoChanged();
+        }
+        reloadCoroutine = null;
+    }
+
+    private void CancelReload()
+    {
+        if (reloadCoroutine != null)
+        {
+            StopCoroutine(reloadCoroutine);
+            reloadCoroutine = null;
+        }
+        WeaponSlot slot = GetCurrentSlot();
+        if (slot != null && slot.isReloading)
+        {
+            slot.isReloading = false;
+            NotifyAmmoChanged();
+        }
+    }
+
+    private void NotifyAmmoChanged()
+    {
+        WeaponSlot slot = GetCurrentSlot();
+        AmmoChanged?.Invoke(slot?.definition, slot?.currentAmmo ?? 0, slot?.definition?.MagazineSize ?? 0,
+            slot?.isReloading ?? false);
+    }
+
+    private void SpawnZombieImpact(Vector3 point, Vector3 normal)
+    {
+        if (zombieBulletImpactPrefab == null)
+            return;
+        Instantiate(zombieBulletImpactPrefab, point + normal * 0.01f, Quaternion.LookRotation(normal));
+    }
+
+    private void OnDisable()
+    {
+        CancelReload();
     }
 
     private static Vector3 GetPelletDirection(Vector3 forward, Vector3 right, Vector3 up, float spreadAngle)

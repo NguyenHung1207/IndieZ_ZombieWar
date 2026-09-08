@@ -4,7 +4,8 @@ using UnityEngine.EventSystems;
 public enum MobileAction
 {
     SwitchWeapon,
-    ThrowGrenade
+    ThrowGrenade,
+    Reload
 }
 
 public sealed class MobileActionButton : MonoBehaviour, IPointerClickHandler
@@ -17,9 +18,17 @@ public sealed class MobileActionButton : MonoBehaviour, IPointerClickHandler
     {
         if (GameSession.Instance != null && !GameSession.Instance.IsPlaying)
             return;
-        if (action == MobileAction.SwitchWeapon)
-            weaponController?.SwitchWeapon();
-        else
-            grenadeController?.ThrowGrenade();
+        switch (action)
+        {
+            case MobileAction.SwitchWeapon:
+                weaponController?.SwitchWeapon();
+                break;
+            case MobileAction.Reload:
+                weaponController?.Reload();
+                break;
+            default:
+                grenadeController?.ThrowGrenade();
+                break;
+        }
     }
 }

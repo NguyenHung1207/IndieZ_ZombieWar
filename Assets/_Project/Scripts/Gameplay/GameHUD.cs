@@ -6,7 +6,9 @@ public sealed class GameHUD : MonoBehaviour
     [SerializeField] private Text healthText;
     [SerializeField] private Text timerText;
     [SerializeField] private Text weaponText;
+    [SerializeField] private Text ammoText;
     [SerializeField] private Image healthFill;
+    [SerializeField] private Image damageFlash;
     [SerializeField] private Text resultText;
     [SerializeField] private GameObject resultPanel;
     [SerializeField] private GameObject mobileControls;
@@ -17,6 +19,8 @@ public sealed class GameHUD : MonoBehaviour
     private PlayerHealth playerHealth;
     private PlayerWeaponController weaponController;
     private GameObject actionControls;
+    private float damageFlashAlpha;
+    private const float DamageFlashFadeSpeed = 3.5f;
 
     private void Start()
     {
@@ -37,8 +41,12 @@ public sealed class GameHUD : MonoBehaviour
         if (weaponController != null)
         {
             weaponController.WeaponChanged += HandleWeaponChanged;
+            weaponController.AmmoChanged += HandleAmmoChanged;
             HandleWeaponChanged(weaponController.EquippedWeapon);
+            HandleAmmoChanged(weaponController.EquippedWeapon, weaponController.CurrentAmmo, weaponController.CurrentMagazineSize, weaponController.IsReloading);
         }
+        if (playerHealth != null)
+            playerHealth.Damaged += HandlePlayerDamaged;
         HandleStateChanged(session != null ? session.State : GameSessionState.Playing);
     }
 
@@ -53,6 +61,13 @@ public sealed class GameHUD : MonoBehaviour
             healthText.text = string.Format("HP  {0:000}", Mathf.CeilToInt(playerHealth.CurrentHealth));
         if (playerHealth != null && healthFill != null)
             healthFill.fillAmount = playerHealth.MaxHealth > 0f ? playerHealth.CurrentHealth / playerHealth.MaxHealth : 0f;
+        if (damageFlash != null)
+        {
+            damageFlashAlpha = Mathf.MoveTowards(damageFlashAlpha, 0f, DamageFlashFadeSpeed * Time.deltaTime);
+            Color color = damageFlash.color;
+            color.a = damageFlashAlpha;
+            damageFlash.color = color;
+        }
     }
 
     private void HandleStateChanged(GameSessionState state)
@@ -74,12 +89,34 @@ public sealed class GameHUD : MonoBehaviour
             weaponText.text = definition != null ? definition.DisplayName.ToUpperInvariant() : "WEAPON";
     }
 
+    private void HandleAmmoChanged(WeaponDefinition definition, int currentAmmo, int magazineSize, bool isReloading)
+    {
+        if (ammoText == null)
+            return;
+
+        ammoText.text = definition == null
+            ? string.Empty
+            : isReloading
+                ? string.Format("{0}/{1}  RELOADING...", currentAmmo, magazineSize)
+                : string.Format("{0}/{1}", currentAmmo, magazineSize);
+    }
+
+    private void HandlePlayerDamaged(float currentHealth, float maxHealth, float damageAmount)
+    {
+        damageFlashAlpha = Mathf.Max(damageFlashAlpha, 0.62f);
+    }
+
     private void OnDestroy()
     {
         if (session != null)
             session.StateChanged -= HandleStateChanged;
         if (weaponController != null)
+        {
             weaponController.WeaponChanged -= HandleWeaponChanged;
+            weaponController.AmmoChanged -= HandleAmmoChanged;
+        }
+        if (playerHealth != null)
+            playerHealth.Damaged -= HandlePlayerDamaged;
         if (restartButton != null && session != null)
             restartButton.onClick.RemoveListener(session.RestartLevel);
         if (mainMenuButton != null && session != null)

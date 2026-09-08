@@ -22,3 +22,5 @@ MonoBehaviour:
   fireMode: 1
   pelletCount: 7
   spreadAngle: 7
+  magazineSize: 6
+  reloadDuration: 2
