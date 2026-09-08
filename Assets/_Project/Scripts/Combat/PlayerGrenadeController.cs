@@ -39,6 +39,6 @@ public sealed class PlayerGrenadeController : MonoBehaviour
                 Physics.IgnoreCollision(playerCollider, grenadeCollider);
         }
 
-        body.velocity = transform.forward * throwForce + Vector3.up * upwardForce;
+        body.linearVelocity = transform.forward * throwForce + Vector3.up * upwardForce;
     }
 }

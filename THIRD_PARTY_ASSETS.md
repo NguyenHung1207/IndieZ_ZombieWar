@@ -1,31 +1,25 @@
 # Third-Party Assets
 
-The assets below are third-party content and are not authored by this project. Source links are provided for reviewer reference.
+The production project uses selected files from the following Unity Asset Store packages. This project does not claim ownership of this art. Each asset remains subject to its respective Unity Asset Store license.
 
-## Current Assets
+## Survivalist Character
 
-### Survivalist Character
+- Source: [Survivalist Character](https://assetstore.unity.com/packages/3d/characters/survivalist-character-181470)
+- Production use: player model, prefab, materials, and textures.
 
-Source: Unity Asset Store
+## Zombie 1 (Low Poly)
 
-https://assetstore.unity.com/packages/3d/characters/survivalist-character-181470
+- Source: [Zombie 1](https://assetstore.unity.com/packages/3d/characters/humanoids/humans/zombie-1-232270)
+- Production use: Zombie model and textures. Project-authored material/controller behavior supplies the final combat presentation and dissolve integration.
 
-Purpose: Current player character model.
+## Guns Pack: Low Poly Guns Collection
 
-### Toon Soldiers WW2 Demo
+- Source: [Guns Pack: Low Poly Guns Collection](https://assetstore.unity.com/packages/3d/props/guns/guns-pack-low-poly-guns-collection-192553)
+- Production use: the `assault1` and `shotgun1` models and textures. Other locally imported weapon variants are deferred and are not production dependencies.
 
-Source: Unity Asset Store
+## Toon Soldiers WW2 Demo
 
-https://assetstore.unity.com/packages/3d/characters/humanoids/toon-soldiers-ww2-demo-85702
+- Source: [Toon Soldiers WW2 Demo](https://assetstore.unity.com/packages/3d/characters/humanoids/toon-soldiers-ww2-demo-85702)
+- Production use: Humanoid combat idle, run, and shoot animation sources plus their required model/material import dependencies.
 
-Purpose: Current Humanoid Idle/Run animation source.
-
-## Planned / Not Yet Committed
-
-### Zombie 1 (Low Poly)
-
-https://assetstore.unity.com/packages/3d/characters/humanoids/humans/zombie-1-232270
-
-### Guns Pack: Low Poly Guns Collection
-
-https://assetstore.unity.com/packages/3d/props/guns/guns-pack-low-poly-guns-collection-192553
+Unity packages such as Universal Render Pipeline, Cinemachine, and AI Navigation are restored through `Packages/manifest.json` and `Packages/packages-lock.json`; they are not vendored Asset Store art.

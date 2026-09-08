@@ -16,12 +16,18 @@ public sealed class GameHUD : MonoBehaviour
     private GameSession session;
     private PlayerHealth playerHealth;
     private PlayerWeaponController weaponController;
+    private GameObject actionControls;
 
     private void Start()
     {
         session = GameSession.Instance;
         playerHealth = FindFirstObjectByType<PlayerHealth>();
         weaponController = FindFirstObjectByType<PlayerWeaponController>();
+        if (mobileControls != null && mobileControls.transform.parent != null)
+        {
+            Transform actionControlsTransform = mobileControls.transform.parent.Find("ActionControls");
+            actionControls = actionControlsTransform != null ? actionControlsTransform.gameObject : null;
+        }
         if (session != null)
             session.StateChanged += HandleStateChanged;
         if (restartButton != null && session != null)
@@ -56,6 +62,8 @@ public sealed class GameHUD : MonoBehaviour
             resultPanel.SetActive(ended);
         if (mobileControls != null)
             mobileControls.SetActive(!ended);
+        if (actionControls != null)
+            actionControls.SetActive(!ended);
         if (resultText != null)
             resultText.text = state == GameSessionState.Victory ? "VICTORY" : "GAME OVER";
     }
