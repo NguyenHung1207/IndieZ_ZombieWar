@@ -62,11 +62,14 @@ public sealed class ZombieHealth : MonoBehaviour, IDamageable
         currentHealth = Mathf.Max(0f, currentHealth - amount);
         flashUntil = Time.time + hitFlashDuration;
         ApplyColor(1f);
-        Hit?.Invoke();
         if (currentHealth <= 0f)
         {
             IsDead = true;
             Died?.Invoke();
+        }
+        else
+        {
+            Hit?.Invoke();
         }
     }
 
