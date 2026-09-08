@@ -24,6 +24,7 @@ Desktop:
 - Mouse0 — Fire
 - Q — Switch weapon
 - G — Throw grenade
+- R — Reload
 
 Mobile:
 
@@ -31,15 +32,18 @@ Mobile:
 - FIRE — Fire
 - SWITCH — Switch weapon
 - GRENADE — Throw grenade
+- RELOAD — Reload current magazine
 
-Firing uses forward-cone aim assist: the best visible living Zombie inside the cone is targeted, while blocked or rear targets are ignored. Movement and firing remain independent.
+Firing uses 360-degree nearest-target auto aim: the nearest living visible Zombie within the active weapon range is selected, with obstacle line-of-sight checks. If no valid target exists, firing uses Player.forward. Movement and firing remain independent.
 
 ## Features
 
 - Top-down Cinemachine follow camera with arena confinement
 - CharacterController movement and layered upper/lower-body animation
 - Automatic assault rifle and semi-automatic multi-pellet shotgun
+- 30-round Rifle and 6-shell Shotgun magazines with reload timing, `R`, automatic empty-magazine reload, and mobile Reload control
 - Weapon switching, recoil, muzzle flash, tracers, hit feedback, and combat audio
+- Zombie bullet impact particles and Player damage-flash feedback
 - Rigidbody grenade arc, collision, explosion damage, knockback, and cleanup
 - AI Navigation/NavMesh Zombie chase and attack behavior
 - Zombie hit/death animation, dissolve shader, and cleanup

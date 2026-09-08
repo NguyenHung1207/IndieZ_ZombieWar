@@ -3,11 +3,11 @@
 ## Release Artifact
 
 - [x] GitHub repository: <https://github.com/NguyenHung1207/IndieZ_ZombieWar>
-- [ ] Final release commit: record after the M13 commit
+- [ ] Final release commit: record after the M15 gate
 - [x] Unity version: `6000.3.15f1`
 - [x] APK path: `Builds/Android/ZombieWar.apk`
-- [x] APK size: `109,436,485` bytes
-- [x] APK SHA-256: `A6A52E6343B5D0E34A2DDC38582E513DCC91291F607F209A2C1D84646AA39441`
+- [ ] APK size: record final M15 build
+- [ ] APK SHA-256: record final M15 build
 - [x] Application identifier: `com.indiez.zombiewar`
 - [x] Version / code: `1.0.0` / `1`
 - [ ] Gameplay video path/link: `<ADD FINAL VIDEO PATH OR URL>`
@@ -23,6 +23,9 @@
 - [x] Recoil, muzzle flash, tracers, particles, and combat audio
 - [x] Rigidbody grenade arc, damage, knockback, and cleanup
 - [x] NavMesh Zombie AI, attacks, hit feedback, death, and dissolve
+- [x] 360-degree nearest visible Zombie auto aim with weapon-specific range
+- [x] Magazine ammo, reload timing, automatic empty reload, and mobile Reload control
+- [x] Zombie bullet impact VFX and Player damage flash
 - [x] Upper/lower-body animation layers
 - [x] Victory, Game Over, Restart, and Main Menu return
 - [x] UI captures checked at 16:9, 18:9, 19.5:9, and 20:9
@@ -39,6 +42,7 @@ No Android device was connected during M13 automation. Complete these on the sub
 - [ ] FIRE release stops automatic fire
 - [ ] SWITCH while moving
 - [ ] SWITCH while firing
+- [ ] R/manual Reload and mobile Reload button
 - [ ] Shotgun remains semi-automatic
 - [ ] Grenade arc, collision, fuse, explosion, damage, and cleanup
 - [ ] Victory/Game Over RESTART and MAIN MENU buttons
@@ -52,9 +56,9 @@ Keep menu footage brief and visibly prove the gameplay requirements in this orde
 - [ ] A. Main Menu
 - [ ] B. Choose PLAY
 - [ ] C. Joystick movement, including diagonal movement
-- [ ] D. Rifle automatic fire, forward-cone aim assist, muzzle flash, tracer, recoil, sound, and damage
+- [ ] D. Rifle automatic fire, 360-degree nearest-target aim, muzzle flash, tracer, recoil, sound, ammo, and damage
 - [ ] E. Weapon switching
-- [ ] F. Shotgun semi-automatic fire and pellet spread
+- [ ] F. Shotgun semi-automatic fire, pellet spread, ammo, and reload
 - [ ] G. Grenade throw arc, collision, and explosion
 - [ ] H. Zombies spawning and chasing on the NavMesh
 - [ ] I. Zombie hit feedback, death animation, and dissolve cleanup
