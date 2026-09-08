@@ -44,17 +44,23 @@ public sealed class WorldChunk : MonoBehaviour
         if (props == null || index < 0 || index >= props.Length || props[index] == null)
             return;
         GameObject instance = Instantiate(props[index], transform);
+        instance.layer = 0;
+        foreach (Transform child in instance.GetComponentsInChildren<Transform>(true)) child.gameObject.layer = 0;
         instance.transform.localPosition = new Vector3(x * size, 0f, z * size);
         instance.transform.localRotation = Quaternion.Euler(0f, (Coordinate.x * 37 + Coordinate.y * 19) % 4 * 90f, 0f);
         instance.transform.localScale = Vector3.one;
         foreach (MeshCollider mesh in instance.GetComponentsInChildren<MeshCollider>(true))
             mesh.enabled = false;
+        foreach (Collider collider in instance.GetComponentsInChildren<Collider>(true))
+            collider.isTrigger = false;
         Renderer[] renderers = instance.GetComponentsInChildren<Renderer>(true);
         if (renderers.Length > 0)
         {
             Bounds bounds = renderers[0].bounds;
             for (int i = 1; i < renderers.Length; i++) bounds.Encapsulate(renderers[i].bounds);
             BoxCollider box = instance.AddComponent<BoxCollider>();
+            box.isTrigger = false;
+            box.enabled = true;
             box.center = instance.transform.InverseTransformPoint(bounds.center);
             box.size = bounds.size;
         }

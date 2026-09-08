@@ -60,6 +60,11 @@ public sealed class PlayerWeaponController : MonoBehaviour
 
     private void Update()
     {
+        if (PauseController.IsPaused)
+        {
+            StopInput();
+            return;
+        }
         if (GameSession.Instance != null && !GameSession.Instance.IsPlaying)
         {
             autoAim?.ClearTarget();
