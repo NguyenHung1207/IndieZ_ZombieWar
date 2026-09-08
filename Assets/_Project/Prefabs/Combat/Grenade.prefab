@@ -190,5 +190,5 @@ MonoBehaviour:
   centerDamage: 90
   edgeDamage: 45
   knockbackForce: 8
-  explosionPrefab: {fileID: 4207327416564030483, guid: 3a41aafdfcb3160439c71fa7f1865861, type: 3}
+  explosionPrefab: {fileID: 19800014, guid: a57a6829db3568c4d9bdc37e9e63c017, type: 3}
   visual: {fileID: 1582318481957502127}

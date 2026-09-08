@@ -135,6 +135,7 @@ public sealed class ZombieAI : MonoBehaviour
         {
             nextAttackTime = Time.time + attackCooldown;
             animationController?.PlayAttack();
+            combatAudio?.Play(CombatSound.ZombieAttack, 0.38f);
             IDamageable damageable = target.GetComponent<PlayerHealth>();
             damageable?.TakeDamage(attackDamage);
         }

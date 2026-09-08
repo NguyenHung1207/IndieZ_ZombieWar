@@ -15,7 +15,7 @@ The production project uses selected files from the following Unity Asset Store 
 ## Guns Pack: Low Poly Guns Collection
 
 - Source: [Guns Pack: Low Poly Guns Collection](https://assetstore.unity.com/packages/3d/props/guns/guns-pack-low-poly-guns-collection-192553)
-- Production use: the `assault1` and `shotgun1` models and textures. Other locally imported weapon variants are deferred and are not production dependencies.
+- Production use: the `assault1` and `shotgun1` models and textures. Other locally imported weapon variants remain future shop candidates.
 
 ## Toon Soldiers WW2 Demo
 
@@ -35,16 +35,16 @@ The production project uses selected files from the following Unity Asset Store 
 ## Zombie Voice Audio Pack Free
 
 - Source: [Zombie Voice Audio Pack Free](https://assetstore.unity.com/packages/audio/sound-fx/creatures/zombie-voice-audio-pack-free-196645)
-- Intake use: selected zombie growl, chase, aggressive, hit-adjacent, and death WAV source clips; runtime audio wiring remains unchanged.
+- Production use: selected moan, aggressive, grunt, and death WAV clips are loaded by the combat-audio presentation layer; other clips remain available for later tuning.
 
 ## Post Apocalypse Guns Demo
 
 - Source: [Post Apocalypse Guns Demo](https://assetstore.unity.com/packages/audio/sound-fx/weapons/post-apocalypse-guns-demo-33515)
-- Intake use: rifle, shotgun, pistol, sniper, far-field, and shotgun reload WAV source clips; runtime weapon audio remains unchanged.
+- Production use: AutoGun rifle, JackHammer shotgun, and JackHammer reload WAV clips are loaded by the combat-audio presentation layer; other variants remain available.
 
 ## War FX
 
 - Source: [War FX](https://assetstore.unity.com/packages/vfx/particles/war-fx-5669)
-- Intake use: mobile bullet impacts, muzzle flashes, explosions, smoke/fire materials, textures, meshes, shaders, and required lightweight VFX helper scripts. Demo/editor systems are excluded.
+- Production use: mobile bullet-impact, muzzle-flash, and small-explosion prefabs are referenced by first-party weapon/grenade adapters. Demo/editor systems are excluded.
 
 Unity packages such as Universal Render Pipeline, Cinemachine, and AI Navigation are restored through `Packages/manifest.json` and `Packages/packages-lock.json`; they are not vendored Asset Store art.

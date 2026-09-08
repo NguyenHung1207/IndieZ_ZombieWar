@@ -9,6 +9,7 @@ public sealed class WeaponSlot
     public Transform muzzle;
     public WeaponRecoil recoil;
     public ParticleSystem muzzleFlash;
+    public GameObject muzzleEffectPrefab;
     public WeaponTracer tracer;
     [NonSerialized] public int currentAmmo;
     [NonSerialized] public bool isReloading;
@@ -137,6 +138,7 @@ public sealed class PlayerWeaponController : MonoBehaviour
             return;
 
         reloadCoroutine = StartCoroutine(ReloadRoutine(slot, definition));
+        combatAudio?.PlayReload(definition.PelletCount > 1);
     }
 
     public bool TryFire()
@@ -166,7 +168,10 @@ public sealed class PlayerWeaponController : MonoBehaviour
         playerAnimationController.PlayShoot();
 
         slot.recoil?.Configure(definition.RecoilDistance, definition.RecoilAngle);
-        slot.muzzleFlash?.Play(true);
+        if (slot.muzzleEffectPrefab != null)
+            SpawnMuzzleEffect(slot.muzzleEffectPrefab, slot.muzzle);
+        else
+            slot.muzzleFlash?.Play(true);
         combatAudio?.Play(definition.PelletCount > 1 ? CombatSound.ShotgunShot : CombatSound.RifleShot, 0.65f);
 
         int pelletCount = Mathf.Clamp(definition.PelletCount, 1, PelletEndpoints.Length);
@@ -288,6 +293,22 @@ public sealed class PlayerWeaponController : MonoBehaviour
         if (zombieBulletImpactPrefab == null)
             return;
         Instantiate(zombieBulletImpactPrefab, point + normal * 0.01f, Quaternion.LookRotation(normal));
+    }
+
+    private static void SpawnMuzzleEffect(GameObject prefab, Transform muzzle)
+    {
+        GameObject effect = Instantiate(prefab, muzzle.position, muzzle.rotation);
+        effect.transform.SetParent(muzzle, true);
+        ParticleSystem[] particles = effect.GetComponentsInChildren<ParticleSystem>(true);
+        float lifetime = 0.5f;
+        for (int i = 0; i < particles.Length; i++)
+        {
+            ParticleSystem.MainModule main = particles[i].main;
+            main.loop = false;
+            particles[i].Play(true);
+            lifetime = Mathf.Max(lifetime, main.duration + main.startLifetime.constantMax + 0.1f);
+        }
+        Destroy(effect, Mathf.Clamp(lifetime, 0.1f, 2f));
     }
 
     private void OnDisable()

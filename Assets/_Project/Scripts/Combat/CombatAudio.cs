@@ -8,13 +8,23 @@ public enum CombatSound
     GrenadeExplosion,
     ZombieHit,
     ZombieDeath,
-    ZombieVoice
+    ZombieVoice,
+    ZombieAttack
 }
 
 [RequireComponent(typeof(AudioSource))]
 public sealed class CombatAudio : MonoBehaviour
 {
     private static readonly Dictionary<CombatSound, AudioClip> Clips = new Dictionary<CombatSound, AudioClip>();
+    private static readonly Dictionary<CombatSound, string> ResourceNames = new Dictionary<CombatSound, string>
+    {
+        { CombatSound.RifleShot, "M16Audio/RifleShot" },
+        { CombatSound.ShotgunShot, "M16Audio/ShotgunShot" },
+        { CombatSound.ZombieVoice, "M16Audio/ZombieMoan" },
+        { CombatSound.ZombieAttack, "M16Audio/ZombieAttack" },
+        { CombatSound.ZombieHit, "M16Audio/ZombieHit" },
+        { CombatSound.ZombieDeath, "M16Audio/ZombieDeath" }
+    };
     private AudioSource source;
 
     private void Awake()
@@ -29,6 +39,15 @@ public sealed class CombatAudio : MonoBehaviour
     public void Play(CombatSound sound, float volume = 1f)
     {
         source.PlayOneShot(GetClip(sound), volume);
+    }
+
+    public void PlayReload(bool shotgun, float volume = 0.45f)
+    {
+        if (!shotgun)
+            return;
+        AudioClip clip = Resources.Load<AudioClip>("M16Audio/ShotgunReload");
+        if (clip != null)
+            source.PlayOneShot(clip, volume);
     }
 
     public static void PlayAt(Vector3 position, CombatSound sound, float volume = 1f)
@@ -46,11 +65,21 @@ public sealed class CombatAudio : MonoBehaviour
         if (Clips.TryGetValue(sound, out AudioClip clip))
             return clip;
 
+        if (ResourceNames.TryGetValue(sound, out string resourceName))
+        {
+            clip = Resources.Load<AudioClip>(resourceName);
+            if (clip != null)
+            {
+                Clips.Add(sound, clip);
+                return clip;
+            }
+        }
+
         int sampleRate = 22050;
         float length = sound == CombatSound.GrenadeExplosion ? 0.65f : sound == CombatSound.ZombieVoice ? 0.42f : 0.16f;
         clip = AudioClip.Create("Generated_" + sound, Mathf.CeilToInt(sampleRate * length), 1, sampleRate, false);
         float[] samples = new float[clip.samples];
-        float baseFrequency = sound == CombatSound.ShotgunShot ? 95f : sound == CombatSound.GrenadeExplosion ? 65f : sound == CombatSound.ZombieVoice ? 150f : sound == CombatSound.ZombieDeath ? 110f : 240f;
+        float baseFrequency = sound == CombatSound.ShotgunShot ? 95f : sound == CombatSound.GrenadeExplosion ? 65f : sound == CombatSound.ZombieVoice || sound == CombatSound.ZombieAttack ? 150f : sound == CombatSound.ZombieDeath ? 110f : 240f;
         uint seed = (uint)(int)sound + 17u;
         for (int i = 0; i < samples.Length; i++)
         {
