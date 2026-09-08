@@ -50,12 +50,34 @@ public sealed class PlayerWeaponController : MonoBehaviour
         autoAim = GetComponent<PlayerAutoAim>();
         if (combatAudio == null)
             combatAudio = GetComponent<CombatAudio>();
+        EnsureWeaponMounting();
         ResolveSavedLoadout();
         currentWeaponIndex = Mathf.Clamp(startingWeaponIndex, 0, Mathf.Max(0, WeaponCount - 1));
         InitializeAmmo();
         ApplyActiveWeapon();
         WeaponChanged?.Invoke(EquippedWeapon);
         NotifyAmmoChanged();
+    }
+
+    private void EnsureWeaponMounting()
+    {
+        if (weapons == null || weapons.Length == 0 || weapons[0]?.weaponObject == null)
+            return;
+        Transform weaponMount = weapons[0].weaponObject.transform.parent;
+        if (weaponMount == null)
+            return;
+        for (int i = 0; i < weapons.Length; i++)
+        {
+            GameObject weapon = weapons[i]?.weaponObject;
+            if (weapon == null)
+                continue;
+            Transform root = weapon.transform;
+            if (root.parent != weaponMount)
+                root.SetParent(weaponMount, false);
+            root.localPosition = Vector3.zero;
+            root.localRotation = Quaternion.identity;
+            root.localScale = Vector3.one;
+        }
     }
 
     private void Update()
