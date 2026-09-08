@@ -50,6 +50,16 @@ public sealed class CombatAudio : MonoBehaviour
             source.PlayOneShot(clip, volume);
     }
 
+    public void PlayWeapon(WeaponDefinition definition, float volume = 1f)
+    {
+        if (definition != null && definition.WeaponId == "weapon_sniper")
+        {
+            AudioClip sniper = Resources.Load<AudioClip>("M19Audio/SniperShot");
+            if (sniper != null) { source.PlayOneShot(sniper, volume); return; }
+        }
+        Play(definition != null && definition.PelletCount > 1 ? CombatSound.ShotgunShot : CombatSound.RifleShot, volume);
+    }
+
     public static void PlayAt(Vector3 position, CombatSound sound, float volume = 1f)
     {
         GameObject audioObject = new GameObject("CombatAudio_" + sound);

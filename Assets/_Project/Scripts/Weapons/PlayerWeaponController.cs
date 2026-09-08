@@ -19,6 +19,7 @@ public sealed class WeaponSlot
 public sealed class PlayerWeaponController : MonoBehaviour
 {
     [SerializeField] private WeaponSlot[] weapons;
+    [SerializeField] private int[] loadoutSlotIndices = { 0, 1 };
     [SerializeField, Min(0)] private int startingWeaponIndex;
     [SerializeField] private CombatAudio combatAudio;
     [SerializeField] private GameObject zombieBulletImpactPrefab;
@@ -35,7 +36,7 @@ public sealed class PlayerWeaponController : MonoBehaviour
     private Coroutine reloadCoroutine;
 
     public int CurrentWeaponIndex => currentWeaponIndex;
-    public int WeaponCount => weapons != null ? weapons.Length : 0;
+    public int WeaponCount => loadoutSlotIndices != null ? loadoutSlotIndices.Length : 0;
     public WeaponDefinition EquippedWeapon => GetCurrentSlot()?.definition;
     public event Action<WeaponDefinition> WeaponChanged;
     public event Action<WeaponDefinition, int, int, bool> AmmoChanged;
@@ -49,6 +50,7 @@ public sealed class PlayerWeaponController : MonoBehaviour
         autoAim = GetComponent<PlayerAutoAim>();
         if (combatAudio == null)
             combatAudio = GetComponent<CombatAudio>();
+        ResolveSavedLoadout();
         currentWeaponIndex = Mathf.Clamp(startingWeaponIndex, 0, Mathf.Max(0, WeaponCount - 1));
         InitializeAmmo();
         ApplyActiveWeapon();
@@ -172,7 +174,7 @@ public sealed class PlayerWeaponController : MonoBehaviour
             SpawnMuzzleEffect(slot.muzzleEffectPrefab, slot.muzzle);
         else
             slot.muzzleFlash?.Play(true);
-        combatAudio?.Play(definition.PelletCount > 1 ? CombatSound.ShotgunShot : CombatSound.RifleShot, 0.65f);
+        combatAudio?.PlayWeapon(definition, 0.65f);
 
         int pelletCount = Mathf.Clamp(definition.PelletCount, 1, PelletEndpoints.Length);
         Vector3 forward = transform.forward;
@@ -208,8 +210,9 @@ public sealed class PlayerWeaponController : MonoBehaviour
 
     private WeaponSlot GetCurrentSlot()
     {
-        return weapons != null && currentWeaponIndex >= 0 && currentWeaponIndex < weapons.Length
-            ? weapons[currentWeaponIndex]
+        int slotIndex = GetLoadoutSlotIndex(currentWeaponIndex);
+        return weapons != null && slotIndex >= 0 && slotIndex < weapons.Length
+            ? weapons[slotIndex]
             : null;
     }
 
@@ -234,8 +237,28 @@ public sealed class PlayerWeaponController : MonoBehaviour
         for (int i = 0; i < weapons.Length; i++)
         {
             if (weapons[i]?.weaponObject != null)
-                weapons[i].weaponObject.SetActive(i == currentWeaponIndex);
+                weapons[i].weaponObject.SetActive(i == GetLoadoutSlotIndex(currentWeaponIndex));
         }
+    }
+
+    private int GetLoadoutSlotIndex(int index) => loadoutSlotIndices != null && index >= 0 && index < loadoutSlotIndices.Length ? loadoutSlotIndices[index] : index;
+
+    private void ResolveSavedLoadout()
+    {
+        if (weapons == null || weapons.Length == 0) return;
+        if (loadoutSlotIndices == null || loadoutSlotIndices.Length != 2) loadoutSlotIndices = new[] { 0, Mathf.Min(1, weapons.Length - 1) };
+        int first = FindOwnedWeapon(WeaponOwnership.GetSlot(0));
+        int second = FindOwnedWeapon(WeaponOwnership.GetSlot(1));
+        if (first < 0) first = 0;
+        if (second < 0 || second == first) second = weapons.Length > 1 && first != 1 ? 1 : 0;
+        loadoutSlotIndices[0] = first; loadoutSlotIndices[1] = second;
+    }
+
+    private int FindOwnedWeapon(string id)
+    {
+        for (int i = 0; i < weapons.Length; i++)
+            if (weapons[i]?.definition != null && weapons[i].definition.WeaponId == id && WeaponOwnership.IsOwned(id)) return i;
+        return -1;
     }
 
     private void InitializeAmmo()
