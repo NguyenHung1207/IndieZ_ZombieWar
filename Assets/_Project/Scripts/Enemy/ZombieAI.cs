@@ -179,8 +179,8 @@ public sealed class ZombieAI : MonoBehaviour
     {
         if (state == State.Dead)
             return;
-        animationController?.PlayHit();
-        combatAudio?.Play(CombatSound.ZombieHit, 0.45f);
+        if (animationController != null && animationController.PlayHit())
+            combatAudio?.Play(CombatSound.ZombieHit, 0.45f);
     }
 
     private void OnDestroy()

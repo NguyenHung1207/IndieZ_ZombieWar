@@ -3,6 +3,7 @@ using UnityEngine.AI;
 
 public sealed class ZombieAnimationController : MonoBehaviour
 {
+    private const float HitReactionCooldown = 0.25f;
     private static readonly int MoveSpeedHash = Animator.StringToHash("MoveSpeed");
     private static readonly int AttackHash = Animator.StringToHash("Attack");
     private static readonly int HitHash = Animator.StringToHash("Hit");
@@ -10,6 +11,7 @@ public sealed class ZombieAnimationController : MonoBehaviour
 
     private Animator animator;
     private NavMeshAgent agent;
+    private float nextHitReactionTime;
 
     private void Awake()
     {
@@ -27,6 +29,15 @@ public sealed class ZombieAnimationController : MonoBehaviour
     }
 
     public void PlayAttack() => animator.SetTrigger(AttackHash);
-    public void PlayHit() => animator.SetTrigger(HitHash);
+    public bool PlayHit()
+    {
+        if (animator == null || Time.time < nextHitReactionTime)
+            return false;
+
+        nextHitReactionTime = Time.time + HitReactionCooldown;
+        animator.ResetTrigger(HitHash);
+        animator.SetTrigger(HitHash);
+        return true;
+    }
     public void PlayDeath() => animator.SetTrigger(DieHash);
 }
