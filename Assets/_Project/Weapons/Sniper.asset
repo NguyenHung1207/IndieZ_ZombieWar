@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
   weaponId: weapon_sniper
   displayName: Sniper Rifle
-  fireRate: 0.8
+  fireRate: 0.7
   range: 40
   recoilDistance: 0.1
   recoilAngle: 2.5
-  damage: 90
+  damage: 110
   fireMode: 1
   pelletCount: 1
-  spreadAngle: 0.5
+  spreadAngle: 0
   magazineSize: 5
-  reloadDuration: 2.3
+  reloadDuration: 2.5

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
   weaponId: weapon_pistol
   displayName: Pistol
-  fireRate: 4
+  fireRate: 3.5
   range: 24
   recoilDistance: 0.05
   recoilAngle: 2.5
