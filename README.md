@@ -1,20 +1,16 @@
-# Zombie War
+# ZOMBIE WAR
 
-## Overview
+Zombie War is a top-down survival game for desktop testing and landscape Android play. Survive a three-minute run across an infinite recycled battlefield, defeat Zombies, collect loot, and manage a persistent two-slot weapon loadout.
 
-Zombie War is a focused top-down survival game created as a Unity recruitment-test project. It presents a complete Main Menu-to-result gameplay loop for desktop testing and landscape Android play.
+## Features
 
-## Unity Version
-
-Unity 6000.3.15f1 LTS.
-
-## Platform
-
-Android, landscape orientation. The release APK targets ARM64 devices running Android 7.1 (API 25) or newer.
-
-## Gameplay
-
-Survive for 3 minutes while fighting progressively spawning Zombies. Enemy pressure increases through the session, up to a maximum of 24 active Zombies.
+- 3-minute top-down survival run with Victory and Game Over
+- Cinemachine camera and an infinite recycled military battlefield
+- Five weapons, persistent weapon Shop, coins, and loot drops
+- Ammo, reload, recoil, muzzle VFX, spatial audio, and 360-degree auto aim
+- Physics grenade with explosion damage, knockback, and an 8-second cooldown
+- NavMesh Zombie chase/attack behavior with hit, death, dissolve, VFX, and audio
+- Responsive Safe Area-aware mobile joystick and action controls
 
 ## Controls
 
@@ -22,79 +18,31 @@ Desktop:
 
 - WASD — Move
 - Mouse0 — Fire
+- R — Reload
 - Q — Switch weapon
 - G — Throw grenade
-- R — Reload
+- Escape — Pause
 
 Mobile:
 
-- Left joystick — Move
-- FIRE — Fire
-- SWITCH — Switch weapon
-- GRENADE — Throw grenade
-- RELOAD — Reload current magazine
-
-Firing uses 360-degree nearest-target auto aim: the nearest living visible Zombie within the active weapon range is selected, with obstacle line-of-sight checks. If no valid target exists, firing uses Player.forward. Movement and firing remain independent.
-
-## Features
-
-- Top-down Cinemachine follow camera with arena confinement
-- CharacterController movement and layered upper/lower-body animation
-- Automatic assault rifle and semi-automatic multi-pellet shotgun
-- 30-round Rifle and 6-shell Shotgun magazines with reload timing, `R`, automatic empty-magazine reload, and mobile Reload control
-- Weapon switching, recoil, muzzle flash, tracers, hit feedback, and combat audio
-- Zombie bullet impact particles and Player damage-flash feedback
-- Rigidbody grenade arc, collision, explosion damage, knockback, and cleanup
-- AI Navigation/NavMesh Zombie chase and attack behavior
-- Zombie hit/death animation, dissolve shader, and cleanup
-- Progressive 180-second survival loop with HP, Victory, Game Over, Restart, and Main Menu return
-- Responsive Safe Area-aware mobile HUD and touch controls
-
-## How To Open
-
-1. Install Unity Editor `6000.3.15f1` with Android Build Support, Android SDK & NDK Tools, and OpenJDK.
-2. Open this repository folder as a Unity project.
-3. Allow Unity to restore the locked packages without changing package versions.
-
-## How To Play
-
-Open `Assets/_Project/Scenes/MainMenu.unity`, enter Play Mode, and choose **PLAY**. The Main Menu is also scene 0 and is the release launch scene.
+- Joystick — Move
+- Fire — Fire
+- Reload — Reload
+- Switch — Switch weapon
+- Grenade — Throw grenade
+- Pause — Pause
 
 ## Build
 
-The deterministic release command is available at **Build > Zombie War > Build Android APK**. It validates the production scenes/assets and produces:
+Use Unity `6000.3.15f1` with Android Build Support, SDK/NDK Tools, and OpenJDK. The release build command is **Build > Zombie War > Build Android APK** and writes:
 
 `Builds/Android/ZombieWar.apk`
 
-The `Builds/` directory is intentionally ignored and the APK is a separate submission artifact. The equivalent command-line build is:
+Release settings: `com.indiez.zombiewar`, version `1.0.0` / code `1`, IL2CPP, ARM64, landscape-only, with Development Build, Script Debugging, and Autoconnect Profiler disabled.
 
-```powershell
-& 'C:\C#\6000.3.15f1\Editor\Unity.exe' `
-  -batchmode -quit `
-  -projectPath 'F:\INDIEZ\IndieZ_ZombieWar' `
-  -buildTarget Android `
-  -executeMethod ReleaseBuild.BuildAndroid `
-  -logFile 'F:\INDIEZ\IndieZ_ZombieWar\Logs\AndroidReleaseBuild.log'
-```
+Production scenes, in order:
 
-Release configuration: package `com.indiez.zombiewar`, version `1.0.0` (version code `1`), IL2CPP, ARM64, minimum API 25, and target API Automatic Highest Installed. Development Build, Script Debugging, Autoconnect Profiler, and Deep Profiling are disabled by the build utility.
+1. `Assets/_Project/Scenes/MainMenu.unity`
+2. `Assets/_Project/Scenes/Gameplay_Level01.unity`
 
-## Architecture
-
-- `GameSession`, `ZombieSpawnDirector`, and `GameHUD` own the survival state, progressive spawn pressure, and presentation of session/player/weapon state.
-- `PlayerMovement`, `PlayerAnimationController`, and `PlayerHealth` own player locomotion, layered animation parameters, and health.
-- `PlayerWeaponController`, `PlayerAutoAim`, weapon definitions, recoil, and tracer components own the two-weapon firing pipeline.
-- `PlayerGrenadeController` and `Grenade` own throwing, Rigidbody flight, explosion effects, damage, and knockback.
-- `ZombieAI`, `ZombieHealth`, `ZombieAnimationController`, and `ZombieDissolve` own navigation, combat state, feedback, death, and cleanup.
-- `VirtualJoystick`, mobile action buttons, `SafeAreaController`, and `MainMenuController` own touch/UI input and navigation.
-
-## Third-Party Assets
-
-The production build uses selected content from Survivalist Character, Zombie 1 (Low Poly), Guns Pack: Low Poly Guns Collection, and Toon Soldiers WW2 Demo. Source links and usage are documented in [THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md). These assets are not authored by this project and remain subject to their respective Unity Asset Store licenses.
-
-## Known Limitations
-
-- The release APK is ARM64-only and supports Android API 25 or newer.
-- M13 automated Editor and APK validation completed without an attached Android device; physical touch, device Safe Area, and device performance checks remain part of the pre-submission manual checklist.
-
-See [SUBMISSION_CHECKLIST.md](SUBMISSION_CHECKLIST.md) for final device checks and the gameplay-video capture plan.
+Third-party production dependencies and sources are documented in [THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md). The release evidence and device/video checklist are in [SUBMISSION_CHECKLIST.md](SUBMISSION_CHECKLIST.md).

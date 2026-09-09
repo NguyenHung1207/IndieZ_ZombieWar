@@ -15,7 +15,7 @@ The production project uses selected files from the following Unity Asset Store 
 ## Guns Pack: Low Poly Guns Collection
 
 - Source: [Guns Pack: Low Poly Guns Collection](https://assetstore.unity.com/packages/3d/props/guns/guns-pack-low-poly-guns-collection-192553)
-- Production use: the `assault1` and `shotgun1` models and textures. Other locally imported weapon variants remain future shop candidates.
+- Production use: assault-rifle, shotgun, SMG, pistol, and sniper models/textures used by the five-weapon loadout and Shop previews.
 
 ## Toon Soldiers WW2 Demo
 
@@ -25,7 +25,7 @@ The production project uses selected files from the following Unity Asset Store 
 ## Military FREE Low Poly 3D Models
 
 - Source: [Military FREE Low Poly 3D Models](https://assetstore.unity.com/packages/3d/environments/military-free-260358)
-- Intake use: environment meshes, prefabs, materials, and textures retained for future world dressing; no demo scenes or conversion packages.
+- Production use: military environment meshes, materials, and props used by the recycled battlefield. Demo scenes and conversion packages are not production scenes.
 
 ## FREE Shirtless Zombie
 
