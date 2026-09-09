@@ -32,6 +32,31 @@ The production project uses selected files from the following Unity Asset Store 
 - Source: [FREE Shirtless Zombie](https://assetstore.unity.com/packages/3d/characters/humanoids/free-shirtless-zombie-276762)
 - Intake use: URP model, materials, textures, and prefabs retained for future zombie visual variants. No package animation clips were present.
 
+## Zombie Mutant Free
+
+- Source: [Zombie Mutant Free](https://assetstore.unity.com/packages/3d/characters/humanoids/zombie-mutant-free-310842)
+- Production use: selected mutant mesh, textures, materials, shader graph, and prefab feed the first-party Giant Zombie presentation wrapper. No package scene was imported.
+
+## FREE Zombie Male AAB
+
+- Source: [FREE Zombie Male AAB](https://assetstore.unity.com/packages/3d/characters/humanoids/free-zombie-male-aab-336744)
+- Production use: selected URP prefab, mesh, URP materials, and textures feed the first-party male visual-variant wrapper. Demo scenes, HDRP content, and shaders were excluded.
+
+## Fat Zombie (Low Poly)
+
+- Source: [Fat Zombie (Low Poly)](https://assetstore.unity.com/packages/3d/characters/humanoids/fat-zombie-low-poly-296216)
+- Production use: selected fat-zombie mesh, textures, material, and prefab feed the first-party heavy visual-variant wrapper. Demo, editor, animation, and documentation assets were excluded.
+
+## 2D Gui Shooter + Icons
+
+- Source: [2D Gui Shooter + Icons](https://assetstore.unity.com/packages/2d/gui/icons/2d-gui-shooter-icons-328881)
+- Production use: `Icons/Icon_51.png` (Fire), `Icon_36.png` (Reload), `Icon_46.png` (Switch Weapon), `Icon_44.png` (Grenade), and `Icon_61.png` (Health). Demo scene and all unselected PNG assets were excluded.
+
+## The Wasteland LITE
+
+- Source: [The Wasteland LITE](https://assetstore.unity.com/packages/3d/environments/industrial/the-wasteland-lite-73054)
+- Production use: `Fortified_Wall_1A`, `Wall_Broken_1A`, `Concrete_Block_1A`, and `Barrier_1A`, with their required FBX/material/texture dependencies. Package scenes, scripts, cameras, and legacy settings are excluded; props are decoration only and use no imported colliders.
+
 ## Zombie Voice Audio Pack Free
 
 - Source: [Zombie Voice Audio Pack Free](https://assetstore.unity.com/packages/audio/sound-fx/creatures/zombie-voice-audio-pack-free-196645)

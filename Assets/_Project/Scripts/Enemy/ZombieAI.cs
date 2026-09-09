@@ -36,6 +36,14 @@ public sealed class ZombieAI : MonoBehaviour
         target = newTarget;
     }
 
+    public void ConfigureCombatStats(float speed, float damage)
+    {
+        moveSpeed = Mathf.Max(0.1f, speed);
+        attackDamage = Mathf.Max(0.1f, damage);
+        if (agent != null)
+            agent.speed = moveSpeed;
+    }
+
     public void StopForGameEnd()
     {
         if (agent != null && agent.isOnNavMesh)

@@ -80,7 +80,7 @@ public sealed class LootPickup : MonoBehaviour
         if (medkit)
         {
             PlayerHealth health = player.GetComponent<PlayerHealth>();
-            if (health == null || health.IsDead || health.CurrentHealth >= health.MaxHealth) return;
+            if (health == null || health.IsDead) return;
             float before = health.CurrentHealth;
             health.Heal(healAmount);
             PickupFeedback.Show(transform.position, "+" + Mathf.CeilToInt(health.CurrentHealth - before) + " HP", new Color(0.42f, 1f, 0.55f));

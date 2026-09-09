@@ -13,6 +13,15 @@ public sealed class ZombieAnimationController : MonoBehaviour
     private NavMeshAgent agent;
     private float nextHitReactionTime;
 
+    public void BindVariantAnimator(Animator variantAnimator)
+    {
+        if (variantAnimator == null)
+            return;
+        variantAnimator.runtimeAnimatorController = animator != null ? animator.runtimeAnimatorController : null;
+        variantAnimator.applyRootMotion = false;
+        animator = variantAnimator;
+    }
+
     private void Awake()
     {
         animator = GetComponentInChildren<Animator>(true);

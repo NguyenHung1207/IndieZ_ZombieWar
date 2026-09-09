@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public sealed class GameHUD : MonoBehaviour
 {
@@ -38,7 +39,7 @@ public sealed class GameHUD : MonoBehaviour
         if (session != null)
             session.StateChanged += HandleStateChanged;
         if (restartButton != null && session != null)
-            restartButton.onClick.AddListener(session.RestartLevel);
+            restartButton.onClick.AddListener(HandlePrimaryResultAction);
         if (mainMenuButton != null && session != null)
             mainMenuButton.onClick.AddListener(session.ReturnToMainMenu);
         if (weaponController != null)
@@ -51,6 +52,7 @@ public sealed class GameHUD : MonoBehaviour
         if (playerHealth != null)
             playerHealth.Damaged += HandlePlayerDamaged;
         HandleStateChanged(session != null ? session.State : GameSessionState.Playing);
+        ShowLevelIntro();
     }
 
     public void ConfigurePresentation(GameObject pauseControl, Text coinsResult)
@@ -93,11 +95,49 @@ public sealed class GameHUD : MonoBehaviour
             pauseButton.SetActive(!ended);
         if (resultText != null)
             resultText.text = state == GameSessionState.Victory ? "VICTORY" : "GAME OVER";
+        if (restartButton != null)
+        {
+            Text label = restartButton.GetComponentInChildren<Text>(true);
+            if (label != null)
+                label.text = state == GameSessionState.Victory && SceneManager.GetActiveScene().name == "Gameplay_Level01"
+                    ? "NEXT LEVEL" : "RESTART";
+        }
         if (ended && resultCoinsText != null)
         {
             CurrencyWallet wallet = FindFirstObjectByType<CurrencyWallet>();
             resultCoinsText.text = wallet != null ? "TOTAL COINS  " + wallet.Coins : "TOTAL COINS  0";
         }
+    }
+
+    private void HandlePrimaryResultAction()
+    {
+        if (session != null && session.State == GameSessionState.Victory && SceneManager.GetActiveScene().name == "Gameplay_Level01")
+            SceneManager.LoadScene("Gameplay_Level02");
+        else
+            session?.RestartLevel();
+    }
+
+    private void ShowLevelIntro()
+    {
+        Transform safe = transform.Find("SafeArea");
+        if (safe == null)
+            return;
+        GameObject banner = new GameObject("LevelIntro", typeof(RectTransform), typeof(Text));
+        banner.transform.SetParent(safe, false);
+        Text text = banner.GetComponent<Text>();
+        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        text.fontStyle = FontStyle.Bold;
+        text.fontSize = 46;
+        text.alignment = TextAnchor.MiddleCenter;
+        text.color = Color.white;
+        text.text = SceneManager.GetActiveScene().name == "Gameplay_Level02"
+            ? "LEVEL 2\nHILL ASSAULT\nSURVIVE 03:00"
+            : "LEVEL 1\nFLAT BATTLEFIELD\nSURVIVE 03:00";
+        RectTransform rect = text.rectTransform;
+        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.anchoredPosition = new Vector2(0f, 160f);
+        rect.sizeDelta = new Vector2(620f, 170f);
+        Destroy(banner, 2.5f);
     }
 
     private void HandleWeaponChanged(WeaponDefinition definition)
@@ -135,7 +175,7 @@ public sealed class GameHUD : MonoBehaviour
         if (playerHealth != null)
             playerHealth.Damaged -= HandlePlayerDamaged;
         if (restartButton != null && session != null)
-            restartButton.onClick.RemoveListener(session.RestartLevel);
+            restartButton.onClick.RemoveListener(HandlePrimaryResultAction);
         if (mainMenuButton != null && session != null)
             mainMenuButton.onClick.RemoveListener(session.ReturnToMainMenu);
     }

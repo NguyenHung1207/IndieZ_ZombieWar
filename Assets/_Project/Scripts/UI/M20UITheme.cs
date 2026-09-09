@@ -30,7 +30,7 @@ public static class M20UITheme
         Text health = GetText(safe, "HealthText");
         StyleText(health, 28, TextAnchor.MiddleLeft, Color.white, FontStyle.Bold);
         SetRect(health.rectTransform, Vector2.up, Vector2.up, Vector2.up, new Vector2(72f, -20f), new Vector2(235f, 48f));
-        Image healthIcon = CreateIcon(safe, "HealthIcon", "Health", Green);
+        Image healthIcon = CreateIcon(safe, "HealthIcon", ShooterSprite("Health") ?? Sprite("Health"), Green);
         SetRect(healthIcon.rectTransform, Vector2.up, Vector2.up, Vector2.up, new Vector2(28f, -25f), new Vector2(38f, 38f));
 
         Image healthBar = GetImage(safe, "HealthBarBackground");
@@ -125,10 +125,14 @@ public static class M20UITheme
         SetRect((RectTransform)joystickRoot, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(34f, 34f), new Vector2(204f, 204f));
         Image baseImage = joystickRoot.GetComponent<Image>();
         StyleImage(baseImage, Sprite("CircleRing"), new Color(0.08f, 0.09f, 0.11f, 0.48f));
+        // This Graphic is the pointer surface for VirtualJoystick. StyleImage
+        // disables raycasts for decorative images, so restore it here only.
+        baseImage.raycastTarget = true;
         Transform handle = joystickRoot.Find("JoystickHandle");
         SetRect((RectTransform)handle, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.zero, new Vector2(82f, 82f));
         Image handleImage = handle.GetComponent<Image>();
         StyleImage(handleImage, Sprite("CircleFill"), new Color(0.78f, 0.80f, 0.82f, 0.72f));
+        handleImage.raycastTarget = false;
         JoystickVisualFeedback feedback = GetOrAdd<JoystickVisualFeedback>(joystickRoot.gameObject);
         feedback.Configure(joystickRoot.GetComponent<VirtualJoystick>(), baseImage, handleImage);
     }
@@ -141,7 +145,7 @@ public static class M20UITheme
         ConfigureActionButton(actions.Find("FireButton"), "Fire", Red, new Vector2(288f, 0f), 156f, "FIRE");
         ConfigureActionButton(actions.Find("GrenadeButton"), "Grenade", OrangeRed, new Vector2(96f, 18f), 118f, string.Empty);
         ConfigureActionButton(actions.Find("ReloadButton"), "Reload", new Color(0.12f, 0.15f, 0.17f, 0.9f), new Vector2(208f, 145f), 100f, string.Empty);
-        ConfigureActionButton(actions.Find("SwitchButton"), "Switch", new Color(0.12f, 0.15f, 0.17f, 0.9f), new Vector2(326f, 182f), 98f, string.Empty);
+        ConfigureActionButton(actions.Find("SwitchButton"), "SwitchWeapon", new Color(0.12f, 0.15f, 0.17f, 0.9f), new Vector2(326f, 182f), 98f, string.Empty);
 
         PlayerGrenadeController grenades = UnityEngine.Object.FindFirstObjectByType<PlayerGrenadeController>();
         Transform grenadeTransform = actions.Find("GrenadeButton");
@@ -170,7 +174,7 @@ public static class M20UITheme
         Image image = transform.GetComponent<Image>();
         image.sprite = Sprite("CircleFill");
         StyleButton(transform.GetComponent<Button>(), background, true);
-        Image icon = CreateIcon(transform, "Icon", iconName, Color.white);
+        Image icon = CreateIcon(transform, "Icon", ShooterSprite(iconName) ?? Sprite(iconName), Color.white);
         SetRect(icon.rectTransform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(0f, string.IsNullOrEmpty(labelText) ? 0f : 8f), Vector2.one * (size * 0.47f));
         Text label = GetText(transform, "Label");
         if (label == null) label = GetText(transform, "Text");
@@ -465,6 +469,7 @@ public static class M20UITheme
     }
 
     private static Sprite Sprite(string name) => Resources.Load<Sprite>("UI/Icons/" + name);
+    private static Sprite ShooterSprite(string name) => Resources.Load<Sprite>("UI/Shooter/" + name);
     private static Text GetText(Transform root, string path) { Transform child = root != null ? root.Find(path) : null; return child != null ? child.GetComponent<Text>() : null; }
     private static Image GetImage(Transform root, string path) { Transform child = root != null ? root.Find(path) : null; return child != null ? child.GetComponent<Image>() : null; }
     private static T GetOrAdd<T>(GameObject gameObject) where T : Component => gameObject.GetComponent<T>() ?? gameObject.AddComponent<T>();

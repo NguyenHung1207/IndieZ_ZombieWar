@@ -10,6 +10,15 @@ public sealed class ProductionDressing : MonoBehaviour
 
     private void Start()
     {
+        // Gameplay_Level01 uses WorldChunk as its sole environment authority.
+        // This presentation-only spawner remains valid for MainMenu, but must
+        // not create non-colliding duplicate Military props in the game world.
+        if (FindFirstObjectByType<InfiniteWorldController>() != null)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
         if (props == null)
             return;
         for (int i = 0; i < props.Length; i++)

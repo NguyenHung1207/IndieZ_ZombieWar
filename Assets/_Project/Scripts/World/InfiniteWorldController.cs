@@ -13,6 +13,8 @@ public sealed class InfiniteWorldController : MonoBehaviour
     private readonly Dictionary<Vector2Int, WorldChunk> chunks = new Dictionary<Vector2Int, WorldChunk>();
     private Vector2Int playerCoordinate;
     private Transform player;
+    private AsyncOperation navMeshUpdate;
+    private bool navMeshUpdateQueued;
     public int ActiveChunkCount => chunks.Count;
     public float ChunkSize => chunkSize;
 
@@ -36,7 +38,7 @@ public sealed class InfiniteWorldController : MonoBehaviour
                 if (component != null && component.GetType().Name.Contains("Confiner3D")) component.enabled = false;
         if (navigationSurface == null) navigationSurface = FindFirstObjectByType<NavMeshSurface>();
         BuildGrid(ChunkCoordinate());
-        RebuildNavigation();
+        BuildInitialNavigation();
     }
 
     private void Update()
@@ -46,7 +48,16 @@ public sealed class InfiniteWorldController : MonoBehaviour
         if (coordinate != playerCoordinate)
         {
             BuildGrid(coordinate);
-            RebuildNavigation();
+            RequestNavigationUpdate();
+        }
+        if (navMeshUpdate != null && navMeshUpdate.isDone)
+        {
+            navMeshUpdate = null;
+            if (navMeshUpdateQueued)
+            {
+                navMeshUpdateQueued = false;
+                RequestNavigationUpdate();
+            }
         }
     }
 
@@ -82,17 +93,32 @@ public sealed class InfiniteWorldController : MonoBehaviour
                 }
                 chunk.name = "WorldChunk_" + coordinate.x + "_" + coordinate.y;
                 chunks.Add(coordinate, chunk);
+
+                int layout = Mathf.Abs(coordinate.x * 31 + coordinate.y * 17) % 6;
+                chunk.Configure(coordinate, chunkSize, groundMaterial, militaryProps, layout);
             }
-            int layout = Mathf.Abs(coordinate.x * 31 + coordinate.y * 17) % 6;
-            chunk.Configure(coordinate, chunkSize, groundMaterial, militaryProps, layout);
         }
     }
 
-    private void RebuildNavigation()
+    private void BuildInitialNavigation()
     {
         if (navigationSurface == null) return;
         navigationSurface.collectObjects = CollectObjects.All;
         navigationSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
         navigationSurface.BuildNavMesh();
+    }
+
+    private void RequestNavigationUpdate()
+    {
+        if (navigationSurface == null || navigationSurface.navMeshData == null)
+            return;
+        if (navMeshUpdate != null && !navMeshUpdate.isDone)
+        {
+            navMeshUpdateQueued = true;
+            return;
+        }
+        navigationSurface.collectObjects = CollectObjects.All;
+        navigationSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+        navMeshUpdate = navigationSurface.UpdateNavMesh(navigationSurface.navMeshData);
     }
 }

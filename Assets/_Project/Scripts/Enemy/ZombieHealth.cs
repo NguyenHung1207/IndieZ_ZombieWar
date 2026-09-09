@@ -20,6 +20,12 @@ public sealed class ZombieHealth : MonoBehaviour, IDamageable
     public float MaxHealth => maxHealth;
     public bool IsDead { get; private set; }
 
+    public void ConfigureMaxHealth(float value)
+    {
+        maxHealth = Mathf.Max(1f, value);
+        currentHealth = maxHealth;
+    }
+
     private void Awake()
     {
         currentHealth = maxHealth;

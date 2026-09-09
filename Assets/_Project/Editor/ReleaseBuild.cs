@@ -19,13 +19,15 @@ public static class ReleaseBuild
     private static readonly string[] BuildScenes =
     {
         "Assets/_Project/Scenes/MainMenu.unity",
-        "Assets/_Project/Scenes/Gameplay_Level01.unity"
+        "Assets/_Project/Scenes/Gameplay_Level01.unity",
+        "Assets/_Project/Scenes/Gameplay_Level02.unity"
     };
 
     private static readonly string[] ProductionRoots =
     {
         "Assets/_Project/Scenes/MainMenu.unity",
         "Assets/_Project/Scenes/Gameplay_Level01.unity",
+        "Assets/_Project/Scenes/Gameplay_Level02.unity",
         "Assets/_Project/Prefabs/Combat/Grenade.prefab",
         "Assets/_Project/Prefabs/Combat/GrenadeExplosion.prefab",
         "Assets/_Project/Prefabs/Enemies/Zombie.prefab",
