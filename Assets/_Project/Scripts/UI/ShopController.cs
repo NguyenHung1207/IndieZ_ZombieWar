@@ -16,10 +16,16 @@ public sealed class ShopController : MonoBehaviour
     [SerializeField] private Button[] secondaryButtons;
     [SerializeField] private Text[] primaryLabels;
     [SerializeField] private Text[] secondaryLabels;
+    [SerializeField] private Text[] infoTexts;
+    [SerializeField] private Text[] stateLabels;
+    [SerializeField] private Image[] cardBackgrounds;
+    [SerializeField] private Image[] cardAccents;
+    [SerializeField] private Image[] priceIcons;
     private CurrencyWallet wallet;
 
     private void Start()
     {
+        M20UITheme.ApplyMainMenu(this);
         wallet = FindFirstObjectByType<CurrencyWallet>();
         if (shopButton != null) shopButton.onClick.AddListener(OpenShop); else CreateShopButtonFallback();
         if (backButton != null) backButton.onClick.AddListener(CloseShop);
@@ -34,8 +40,46 @@ public sealed class ShopController : MonoBehaviour
     private void CreateCard(int i, WeaponDefinition d) { float x=(i-(definitions.Length-1)*.5f)*190; GameObject card=new GameObject("Card_"+d.DisplayName,typeof(RectTransform),typeof(Image)); card.transform.SetParent(shopPanel.transform,false); RectTransform r=card.GetComponent<RectTransform>(); r.anchorMin=r.anchorMax=new Vector2(.5f,.5f); r.anchoredPosition=new Vector2(x,55); r.sizeDelta=new Vector2(175,250); card.GetComponent<Image>().color=new Color(.12f,.15f,.19f,.98f); GameObject info=CreateText(d.DisplayName.ToUpperInvariant()+"\nDMG "+d.Damage+"  MAG "+d.MagazineSize+"\nRANGE "+d.Range+" m",card.transform,16); info.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,65); primaryButtons[i]=CreateUI("BUY",card.transform).GetComponent<Button>(); primaryButtons[i].GetComponent<RectTransform>().anchoredPosition=new Vector2(0,-65); primaryButtons[i].GetComponent<RectTransform>().sizeDelta=new Vector2(150,44); primaryLabels[i]=primaryButtons[i].GetComponentInChildren<Text>(); secondaryButtons[i]=CreateUI("SLOT 2",card.transform).GetComponent<Button>(); secondaryButtons[i].GetComponent<RectTransform>().anchoredPosition=new Vector2(0,-112); secondaryButtons[i].GetComponent<RectTransform>().sizeDelta=new Vector2(150,38); secondaryLabels[i]=secondaryButtons[i].GetComponentInChildren<Text>(); int captured=i; primaryButtons[i].onClick.AddListener(()=>HandleAction(captured,0)); secondaryButtons[i].onClick.AddListener(()=>HandleAction(captured,1)); RefreshCard(primaryLabels[i],i,0); RefreshCard(secondaryLabels[i],i,1); }
     private void RefreshCard(Text t,int i,int slot) { if(!t||definitions==null||i>=definitions.Length||!definitions[i])return; WeaponDefinition d=definitions[i]; t.text=!WeaponOwnership.IsOwned(d.WeaponId)?(slot==0?"BUY "+prices[i]:"LOCKED"):(WeaponOwnership.GetSlot(slot)==d.WeaponId?"EQUIPPED":"EQUIP S"+(slot+1)); }
     private void HandleAction(int i,int slot) { if(definitions==null||i>=definitions.Length||!definitions[i])return; WeaponDefinition d=definitions[i]; if(!WeaponOwnership.IsOwned(d.WeaponId)){if(slot!=0)return; if(wallet==null||!wallet.TrySpend(prices[i])){if(feedbackText)feedbackText.text="NOT ENOUGH COINS";return;} WeaponOwnership.Unlock(d.WeaponId);if(feedbackText)feedbackText.text="PURCHASED "+d.DisplayName.ToUpperInvariant();RefreshAllCards();return;} string other=WeaponOwnership.GetSlot(1-slot);if(other==d.WeaponId){if(feedbackText)feedbackText.text="ALREADY EQUIPPED";return;} WeaponOwnership.SetSlot(slot,d.WeaponId);if(feedbackText)feedbackText.text="EQUIPPED "+d.DisplayName.ToUpperInvariant();RefreshAllCards(); }
-    private void RefreshAllCards(){if(definitions==null)return;for(int i=0;i<definitions.Length;i++){if(primaryLabels!=null&&i<primaryLabels.Length)RefreshCard(primaryLabels[i],i,0);if(secondaryLabels!=null&&i<secondaryLabels.Length)RefreshCard(secondaryLabels[i],i,1);}}
-    private void RefreshCoins(int value){if(coinsText)coinsText.text="COINS  "+value;}
+    private void RefreshAllCards(){if(definitions==null)return;for(int i=0;i<definitions.Length;i++){if(primaryLabels!=null&&i<primaryLabels.Length)RefreshCard(primaryLabels[i],i,0);if(secondaryLabels!=null&&i<secondaryLabels.Length)RefreshCard(secondaryLabels[i],i,1);RefreshCardPresentation(i);}}
+    private void RefreshCardPresentation(int i)
+    {
+        if (definitions == null || i < 0 || i >= definitions.Length || definitions[i] == null) return;
+        WeaponDefinition definition = definitions[i];
+        bool owned = WeaponOwnership.IsOwned(definition.WeaponId);
+        bool slotOne = WeaponOwnership.GetSlot(0) == definition.WeaponId;
+        bool slotTwo = WeaponOwnership.GetSlot(1) == definition.WeaponId;
+        if (infoTexts != null && i < infoTexts.Length && infoTexts[i] != null)
+        {
+            string damage = definition.PelletCount > 1
+                ? string.Format("{0:0} x {1}", definition.Damage, definition.PelletCount)
+                : string.Format("{0:0}", definition.Damage);
+            infoTexts[i].text = string.Format("DMG        {0}\nRATE       {1:0.0}/s\nMAG        {2}\nRELOAD     {3:0.0}s\nRANGE      {4:0}m",
+                damage, definition.FireRate, definition.MagazineSize, definition.ReloadDuration, definition.Range);
+        }
+        if (stateLabels != null && i < stateLabels.Length && stateLabels[i] != null)
+        {
+            stateLabels[i].text = !owned ? "LOCKED   " + prices[i] : slotOne ? "EQUIPPED SLOT 1" : slotTwo ? "EQUIPPED SLOT 2" : "OWNED";
+            stateLabels[i].color = !owned ? new Color(0.72f, 0.75f, 0.78f) : new Color(1f, 0.72f, 0.18f);
+        }
+        if (cardBackgrounds != null && i < cardBackgrounds.Length && cardBackgrounds[i] != null)
+            cardBackgrounds[i].color = !owned ? new Color(0.055f, 0.065f, 0.075f, 0.96f) : new Color(0.085f, 0.105f, 0.12f, 0.98f);
+        if (cardAccents != null && i < cardAccents.Length && cardAccents[i] != null)
+            cardAccents[i].color = slotOne || slotTwo ? new Color(0.78f, 0.08f, 0.08f, 1f) : owned ? new Color(0.82f, 0.58f, 0.12f, 1f) : new Color(0.26f, 0.28f, 0.30f, 1f);
+        if (priceIcons != null && i < priceIcons.Length && priceIcons[i] != null)
+            priceIcons[i].gameObject.SetActive(!owned);
+        if (secondaryButtons != null && i < secondaryButtons.Length && secondaryButtons[i] != null)
+            secondaryButtons[i].interactable = owned;
+    }
+    public void ConfigurePresentation(Text coinValue, Text[] stats, Text[] states, Image[] backgrounds, Image[] accents, Image[] priceMarkers)
+    {
+        coinsText = coinValue;
+        infoTexts = stats;
+        stateLabels = states;
+        cardBackgrounds = backgrounds;
+        cardAccents = accents;
+        priceIcons = priceMarkers;
+    }
+    private void RefreshCoins(int value){if(coinsText)coinsText.text=value.ToString();}
     private GameObject CreateUI(string text,Transform parent){GameObject go=new GameObject(text,typeof(RectTransform),typeof(Image),typeof(Button));go.transform.SetParent(parent,false);go.GetComponent<Image>().color=new Color(.18f,.24f,.3f,.98f);GameObject label=CreateText(text,go.transform,20);label.GetComponent<RectTransform>().anchoredPosition=Vector2.zero;return go;}
     private GameObject CreateText(string text,Transform parent,int size){GameObject go=new GameObject("Text",typeof(RectTransform),typeof(Text));go.transform.SetParent(parent,false);Text t=go.GetComponent<Text>();t.text=text;t.alignment=TextAnchor.MiddleCenter;t.color=Color.white;t.fontSize=size;t.font=Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");t.raycastTarget=false;t.rectTransform.sizeDelta=new Vector2(500,100);return go;}
     private void OnDestroy(){if(wallet!=null)wallet.Changed-=RefreshCoins;}

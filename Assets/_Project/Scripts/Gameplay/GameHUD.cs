@@ -12,6 +12,8 @@ public sealed class GameHUD : MonoBehaviour
     [SerializeField] private Text resultText;
     [SerializeField] private GameObject resultPanel;
     [SerializeField] private GameObject mobileControls;
+    [SerializeField] private GameObject pauseButton;
+    [SerializeField] private Text resultCoinsText;
     [SerializeField] private Button restartButton;
     [SerializeField] private Button mainMenuButton;
 
@@ -24,6 +26,7 @@ public sealed class GameHUD : MonoBehaviour
 
     private void Start()
     {
+        M20UITheme.ApplyGameplay(transform, this);
         session = GameSession.Instance;
         playerHealth = FindFirstObjectByType<PlayerHealth>();
         weaponController = FindFirstObjectByType<PlayerWeaponController>();
@@ -50,15 +53,22 @@ public sealed class GameHUD : MonoBehaviour
         HandleStateChanged(session != null ? session.State : GameSessionState.Playing);
     }
 
+    public void ConfigurePresentation(GameObject pauseControl, Text coinsResult)
+    {
+        pauseButton = pauseControl;
+        resultCoinsText = coinsResult;
+    }
+
     private void Update()
     {
         if (session != null && timerText != null)
         {
             int totalSeconds = Mathf.CeilToInt(session.RemainingTime);
-            timerText.text = string.Format("TIME  {0:00}:{1:00}", totalSeconds / 60, totalSeconds % 60);
+            timerText.text = string.Format("{0:00}:{1:00}", totalSeconds / 60, totalSeconds % 60);
+            timerText.color = totalSeconds <= 30 ? new Color(1f, 0.36f, 0.28f) : Color.white;
         }
         if (playerHealth != null && healthText != null)
-            healthText.text = string.Format("HP  {0:000}", Mathf.CeilToInt(playerHealth.CurrentHealth));
+            healthText.text = string.Format("{0:0} / {1:0}", Mathf.CeilToInt(playerHealth.CurrentHealth), Mathf.CeilToInt(playerHealth.MaxHealth));
         if (playerHealth != null && healthFill != null)
             healthFill.fillAmount = playerHealth.MaxHealth > 0f ? playerHealth.CurrentHealth / playerHealth.MaxHealth : 0f;
         if (damageFlash != null)
@@ -79,8 +89,15 @@ public sealed class GameHUD : MonoBehaviour
             mobileControls.SetActive(!ended);
         if (actionControls != null)
             actionControls.SetActive(!ended);
+        if (pauseButton != null)
+            pauseButton.SetActive(!ended);
         if (resultText != null)
             resultText.text = state == GameSessionState.Victory ? "VICTORY" : "GAME OVER";
+        if (ended && resultCoinsText != null)
+        {
+            CurrencyWallet wallet = FindFirstObjectByType<CurrencyWallet>();
+            resultCoinsText.text = wallet != null ? "TOTAL COINS  " + wallet.Coins : "TOTAL COINS  0";
+        }
     }
 
     private void HandleWeaponChanged(WeaponDefinition definition)

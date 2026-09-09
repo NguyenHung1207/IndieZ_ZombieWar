@@ -6,9 +6,13 @@ public sealed class PlayerGrenadeController : MonoBehaviour
     [SerializeField] private Transform throwPoint;
     [SerializeField, Min(0f)] private float throwForce = 8f;
     [SerializeField, Min(0f)] private float upwardForce = 3f;
-    [SerializeField, Min(0.1f)] private float throwCooldown = 1f;
+    [SerializeField, Min(0.1f)] private float grenadeCooldown = 8f;
 
     private float nextThrowTime;
+
+    public bool CanThrow => Time.time >= nextThrowTime;
+    public float CooldownRemaining => Mathf.Max(0f, nextThrowTime - Time.time);
+    public float CooldownNormalized => grenadeCooldown > 0f ? Mathf.Clamp01(CooldownRemaining / grenadeCooldown) : 0f;
 
     private void Update()
     {
@@ -26,7 +30,7 @@ public sealed class PlayerGrenadeController : MonoBehaviour
         if (grenadePrefab == null || throwPoint == null || Time.time < nextThrowTime)
             return;
 
-        nextThrowTime = Time.time + throwCooldown;
+        nextThrowTime = Time.time + grenadeCooldown;
         Grenade grenade = Instantiate(grenadePrefab, throwPoint.position, throwPoint.rotation);
         Rigidbody body = grenade.GetComponent<Rigidbody>();
         if (body == null)

@@ -5,6 +5,7 @@ public sealed class CurrencyHUD : MonoBehaviour
 {
     [SerializeField] private Text currencyText;
     private CurrencyWallet wallet;
+    public void Configure(Text text) => currencyText = text;
     private void Start()
     {
         if (currencyText == null)
@@ -16,6 +17,6 @@ public sealed class CurrencyHUD : MonoBehaviour
         }
         wallet = FindFirstObjectByType<CurrencyWallet>(); if (wallet != null) { wallet.Changed += Refresh; Refresh(wallet.Coins); }
     }
-    private void Refresh(int coins) { if (currencyText != null) currencyText.text = "COINS  " + coins; }
+    private void Refresh(int coins) { if (currencyText != null) currencyText.text = coins.ToString(); }
     private void OnDestroy() { if (wallet != null) wallet.Changed -= Refresh; }
 }
