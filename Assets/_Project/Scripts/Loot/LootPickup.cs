@@ -5,13 +5,16 @@ public sealed class LootPickup : MonoBehaviour
     [SerializeField] private bool medkit;
     [SerializeField, Min(1f)] private float healAmount = 25f;
     [SerializeField, Min(1)] private int coinValue = 1;
-    [SerializeField, Min(0.1f)] private float magnetRange = 3.5f;
+    [SerializeField, Min(0.1f)] private float magnetRange = 5f;
+    [SerializeField, Min(0.1f)] private float magnetStartSpeed = 6f;
+    [SerializeField, Min(0.1f)] private float magnetMaxSpeed = 14f;
     [SerializeField, Min(1f)] private float lifetime = 25f;
     [SerializeField, Min(0.01f)] private float pickupDistance = 0.55f;
     private Transform player;
     private float born;
     private Vector3 basePosition;
     private bool collected;
+    private bool magnetizing;
     public void InitializeCoin(int value) { coinValue = Mathf.Max(1, value); }
 
     private void Awake()
@@ -29,14 +32,41 @@ public sealed class LootPickup : MonoBehaviour
             player = health != null ? health.transform : null;
         }
         transform.Rotate(0f, 90f * Time.deltaTime, 0f, Space.World);
-        transform.position = basePosition + Vector3.up * (0.12f + Mathf.Sin((Time.time - born) * 3f) * 0.06f);
-        if (player == null) return;
-        float distance = Vector3.Distance(transform.position, player.position);
-        if (distance <= magnetRange)
+        if (player == null)
         {
-            transform.position = Vector3.MoveTowards(transform.position, player.position + Vector3.up * 0.6f, 8f * Time.deltaTime);
-            if (distance <= pickupDistance) TryCollect();
+            UpdateIdlePosition();
+            return;
         }
+
+        Vector3 target = player.position + Vector3.up * 0.6f;
+        Vector3 offset = target - transform.position;
+        float distanceSqr = offset.sqrMagnitude;
+        float magnetRangeSqr = magnetRange * magnetRange;
+        if (!magnetizing && distanceSqr <= magnetRangeSqr)
+            magnetizing = true;
+
+        if (!magnetizing)
+        {
+            UpdateIdlePosition();
+            return;
+        }
+
+        float pickupDistanceSqr = pickupDistance * pickupDistance;
+        if (distanceSqr <= pickupDistanceSqr)
+        {
+            TryCollect();
+            return;
+        }
+
+        float distance = Mathf.Sqrt(distanceSqr);
+        float proximity = 1f - Mathf.Clamp01(distance / magnetRange);
+        float speed = Mathf.Lerp(magnetStartSpeed, magnetMaxSpeed, proximity * proximity);
+        transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
+    }
+
+    private void UpdateIdlePosition()
+    {
+        transform.position = basePosition + Vector3.up * (0.12f + Mathf.Sin((Time.time - born) * 3f) * 0.06f);
     }
     private void OnTriggerEnter(Collider other)
     {
