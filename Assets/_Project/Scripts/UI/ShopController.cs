@@ -61,10 +61,24 @@ public sealed class ShopController : MonoBehaviour
             stateLabels[i].text = !owned ? "LOCKED   " + prices[i] : slotOne ? "EQUIPPED SLOT 1" : slotTwo ? "EQUIPPED SLOT 2" : "OWNED";
             stateLabels[i].color = !owned ? new Color(0.72f, 0.75f, 0.78f) : new Color(1f, 0.72f, 0.18f);
         }
+        bool equipped = slotOne || slotTwo;
         if (cardBackgrounds != null && i < cardBackgrounds.Length && cardBackgrounds[i] != null)
-            cardBackgrounds[i].color = !owned ? new Color(0.055f, 0.065f, 0.075f, 0.96f) : new Color(0.085f, 0.105f, 0.12f, 0.98f);
+        {
+            cardBackgrounds[i].color = !owned
+                ? new Color(0.042f, 0.049f, 0.056f, 0.94f)
+                : equipped
+                    ? new Color(0.105f, 0.125f, 0.14f, 1f)
+                    : new Color(0.075f, 0.088f, 0.098f, 0.98f);
+            Outline outline = cardBackgrounds[i].GetComponent<Outline>();
+            if (outline != null)
+                outline.effectColor = equipped
+                    ? new Color(0.95f, 0.12f, 0.09f, 0.96f)
+                    : owned
+                        ? new Color(0.34f, 0.38f, 0.41f, 0.82f)
+                        : new Color(0.14f, 0.16f, 0.18f, 0.62f);
+        }
         if (cardAccents != null && i < cardAccents.Length && cardAccents[i] != null)
-            cardAccents[i].color = slotOne || slotTwo ? new Color(0.78f, 0.08f, 0.08f, 1f) : owned ? new Color(0.82f, 0.58f, 0.12f, 1f) : new Color(0.26f, 0.28f, 0.30f, 1f);
+            cardAccents[i].color = equipped ? new Color(0.95f, 0.12f, 0.09f, 1f) : owned ? new Color(0.48f, 0.52f, 0.55f, 1f) : new Color(0.20f, 0.22f, 0.24f, 0.75f);
         if (priceIcons != null && i < priceIcons.Length && priceIcons[i] != null)
             priceIcons[i].gameObject.SetActive(!owned);
         if (secondaryButtons != null && i < secondaryButtons.Length && secondaryButtons[i] != null)

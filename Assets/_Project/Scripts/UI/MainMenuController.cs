@@ -50,6 +50,7 @@ public sealed class MainMenuController : MonoBehaviour
         levelSelectPanel.SetActive(false);
         settingsPanel = BuildSettings(safeArea);
         settingsPanel.SetActive(false);
+        M20UITheme.ApplyRuntimeMainMenuPanels(safeArea);
     }
 
     private void ShowLevelSelect()
@@ -73,7 +74,7 @@ public sealed class MainMenuController : MonoBehaviour
     {
         if (mainMenuPanel == null || mainMenuPanel.transform.Find("SettingsButton") != null)
             return;
-        Button settings = CreateButton(mainMenuPanel.transform, "SETTINGS", new Vector2(0f, -168f), new Vector2(370f, 78f), new Color(0.13f, 0.16f, 0.18f, 0.96f), 28);
+        Button settings = CreateButton(mainMenuPanel.transform, "SETTINGS", new Vector2(0f, -168f), new Vector2(390f, 72f), new Color(0.13f, 0.16f, 0.18f, 0.96f), 28);
         settings.gameObject.name = "SettingsButton";
         Button quit = quitButton;
         if (quit != null)
@@ -87,27 +88,29 @@ public sealed class MainMenuController : MonoBehaviour
         panel.transform.SetParent(safeArea, false);
         RectTransform rect = panel.GetComponent<RectTransform>();
         rect.anchorMin = rect.anchorMax = rect.pivot = Vector2.one * 0.5f;
-        rect.sizeDelta = new Vector2(620f, 460f);
+        rect.sizeDelta = new Vector2(620f, 400f);
         panel.GetComponent<Image>().color = new Color(0.025f, 0.035f, 0.04f, 0.96f);
-        CreateText("SETTINGS", panel.transform, new Vector2(0f, 155f), new Vector2(500f, 70f), 48, Color.white).fontStyle = FontStyle.Bold;
+        CreateText("SETTINGS", panel.transform, new Vector2(0f, 130f), new Vector2(500f, 64f), 46, Color.white).fontStyle = FontStyle.Bold;
         bool music = PlayerPrefs.GetInt("ZombieWar.MusicEnabled", 1) == 1;
         bool sfx = PlayerPrefs.GetInt("ZombieWar.SfxEnabled", 1) == 1;
-        Button musicButton = CreateButton(panel.transform, music ? "MUSIC  ON" : "MUSIC  OFF", new Vector2(0f, 58f), new Vector2(360f, 70f), new Color(0.13f, 0.16f, 0.18f, 0.96f), 24);
-        Button sfxButton = CreateButton(panel.transform, sfx ? "SFX  ON" : "SFX  OFF", new Vector2(0f, -28f), new Vector2(360f, 70f), new Color(0.13f, 0.16f, 0.18f, 0.96f), 24);
-        musicButton.onClick.AddListener(() => ToggleSetting("ZombieWar.MusicEnabled", musicButton, "MUSIC"));
-        sfxButton.onClick.AddListener(() => ToggleSetting("ZombieWar.SfxEnabled", sfxButton, "SFX"));
-        Button back = CreateButton(panel.transform, "BACK", new Vector2(0f, -145f), new Vector2(280f, 66f), new Color(0.075f, 0.085f, 0.095f, 0.96f), 25);
+        CreateText("MUSIC", panel.transform, new Vector2(-116f, 48f), new Vector2(190f, 58f), 25, Color.white).alignment = TextAnchor.MiddleLeft;
+        CreateText("SFX", panel.transform, new Vector2(-116f, -30f), new Vector2(190f, 58f), 25, Color.white).alignment = TextAnchor.MiddleLeft;
+        Button musicButton = CreateButton(panel.transform, music ? "ON" : "OFF", new Vector2(122f, 48f), new Vector2(180f, 58f), new Color(0.13f, 0.16f, 0.18f, 0.96f), 23);
+        Button sfxButton = CreateButton(panel.transform, sfx ? "ON" : "OFF", new Vector2(122f, -30f), new Vector2(180f, 58f), new Color(0.13f, 0.16f, 0.18f, 0.96f), 23);
+        musicButton.onClick.AddListener(() => ToggleSetting("ZombieWar.MusicEnabled", musicButton));
+        sfxButton.onClick.AddListener(() => ToggleSetting("ZombieWar.SfxEnabled", sfxButton));
+        Button back = CreateButton(panel.transform, "BACK", new Vector2(0f, -128f), new Vector2(280f, 60f), new Color(0.075f, 0.085f, 0.095f, 0.96f), 24);
         back.onClick.AddListener(() => { panel.SetActive(false); mainMenuPanel.SetActive(true); });
         return panel;
     }
 
-    private static void ToggleSetting(string key, Button button, string label)
+    private static void ToggleSetting(string key, Button button)
     {
         bool enabled = PlayerPrefs.GetInt(key, 1) == 0;
         PlayerPrefs.SetInt(key, enabled ? 1 : 0);
         PlayerPrefs.Save();
         Text text = button.GetComponentInChildren<Text>();
-        if (text != null) text.text = label + (enabled ? "  ON" : "  OFF");
+        if (text != null) text.text = enabled ? "ON" : "OFF";
     }
 
     private GameObject BuildLevelSelect(Transform safeArea)
@@ -116,29 +119,34 @@ public sealed class MainMenuController : MonoBehaviour
         panel.transform.SetParent(safeArea, false);
         RectTransform panelRect = panel.GetComponent<RectTransform>();
         panelRect.anchorMin = panelRect.anchorMax = panelRect.pivot = Vector2.one * 0.5f;
-        panelRect.sizeDelta = new Vector2(820f, 650f);
+        panelRect.sizeDelta = new Vector2(820f, 620f);
         Image panelImage = panel.GetComponent<Image>();
         panelImage.color = new Color(0.025f, 0.035f, 0.04f, 0.96f);
         Outline outline = panel.GetComponent<Outline>();
         outline.effectColor = new Color(0.32f, 0.035f, 0.035f, 0.9f);
         outline.effectDistance = new Vector2(3f, -3f);
 
-        CreateText("LEVEL SELECT", panel.transform, new Vector2(0f, 245f), new Vector2(720f, 80f), 52, Color.white);
-        CreateLevelButton(panel.transform, "LEVEL 1", "FLAT BATTLEFIELD\nSURVIVE 3 MINUTES", new Vector2(0f, 108f), new Color(0.70f, 0.055f, 0.055f, 0.94f), "Gameplay_Level01");
-        CreateLevelButton(panel.transform, "LEVEL 2", "HILL ASSAULT\nSLOPES + GIANT ZOMBIE\nBONUS LEVEL", new Vector2(0f, -72f), new Color(0.13f, 0.16f, 0.18f, 0.98f), "Gameplay_Level02");
-        Button back = CreateButton(panel.transform, "BACK", new Vector2(0f, -255f), new Vector2(280f, 66f), new Color(0.075f, 0.085f, 0.095f, 0.96f), 25);
+        CreateText("LEVEL SELECT", panel.transform, new Vector2(0f, 228f), new Vector2(720f, 76f), 50, Color.white);
+        CreateLevelButton(panel.transform, "LEVEL 1", "FLAT BATTLEFIELD   •   SURVIVE 3 MINUTES", new Vector2(0f, 92f), new Color(0.70f, 0.055f, 0.055f, 0.94f), "Gameplay_Level01");
+        CreateLevelButton(panel.transform, "LEVEL 2", "HILL ASSAULT   •   SLOPES + GIANT ZOMBIE", new Vector2(0f, -76f), new Color(0.13f, 0.16f, 0.18f, 0.98f), "Gameplay_Level02");
+        Button back = CreateButton(panel.transform, "BACK", new Vector2(0f, -238f), new Vector2(280f, 62f), new Color(0.075f, 0.085f, 0.095f, 0.96f), 24);
         back.onClick.AddListener(HideLevelSelect);
         return panel;
     }
 
     private void CreateLevelButton(Transform parent, string title, string description, Vector2 position, Color color, string sceneName)
     {
-        Button button = CreateButton(parent, title, position, new Vector2(590f, 142f), color, 32);
+        Button button = CreateButton(parent, title, position, new Vector2(620f, 132f), color, 32);
         Text label = button.GetComponentInChildren<Text>();
-        label.rectTransform.anchoredPosition = new Vector2(0f, 28f);
+        label.rectTransform.anchoredPosition = new Vector2(0f, 24f);
         label.rectTransform.sizeDelta = new Vector2(540f, 55f);
-        Text detail = CreateText(description, button.transform, new Vector2(0f, -32f), new Vector2(540f, 72f), 19, new Color(0.84f, 0.87f, 0.89f));
+        Text detail = CreateText(description, button.transform, new Vector2(38f, -27f), new Vector2(470f, 42f), 20, new Color(0.90f, 0.92f, 0.94f));
         detail.fontStyle = FontStyle.Bold;
+        if (sceneName == "Gameplay_Level02")
+        {
+            Text bonus = CreateText("BONUS", button.transform, new Vector2(226f, 38f), new Vector2(104f, 30f), 17, new Color(1f, 0.72f, 0.14f));
+            bonus.fontStyle = FontStyle.Bold;
+        }
         button.onClick.AddListener(() => SceneManager.LoadScene(sceneName));
     }
 

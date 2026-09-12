@@ -11,6 +11,9 @@ public sealed class InfiniteWorldController : MonoBehaviour
     [SerializeField] private GameObject[] militaryProps;
     [SerializeField] private NavMeshSurface navigationSurface;
     private readonly Dictionary<Vector2Int, WorldChunk> chunks = new Dictionary<Vector2Int, WorldChunk>();
+    private readonly HashSet<Vector2Int> requiredCoordinates = new HashSet<Vector2Int>();
+    private readonly List<Vector2Int> staleCoordinates = new List<Vector2Int>();
+    private readonly List<WorldChunk> recycledChunks = new List<WorldChunk>();
     private Vector2Int playerCoordinate;
     private Transform player;
     private AsyncOperation navMeshUpdate;
@@ -70,34 +73,39 @@ public sealed class InfiniteWorldController : MonoBehaviour
     private void BuildGrid(Vector2Int center)
     {
         playerCoordinate = center;
-        HashSet<Vector2Int> required = new HashSet<Vector2Int>();
+        requiredCoordinates.Clear();
         for (int x = -activeRadius; x <= activeRadius; x++)
-            for (int y = -activeRadius; y <= activeRadius; y++) required.Add(center + new Vector2Int(x, y));
-        List<Vector2Int> stale = new List<Vector2Int>();
-        foreach (var pair in chunks) if (!required.Contains(pair.Key)) stale.Add(pair.Key);
-        List<WorldChunk> recycled = new List<WorldChunk>();
-        for (int i = 0; i < stale.Count; i++) { recycled.Add(chunks[stale[i]]); chunks.Remove(stale[i]); }
-        foreach (Vector2Int coordinate in required)
+            for (int y = -activeRadius; y <= activeRadius; y++) requiredCoordinates.Add(center + new Vector2Int(x, y));
+        staleCoordinates.Clear();
+        recycledChunks.Clear();
+        foreach (var pair in chunks) if (!requiredCoordinates.Contains(pair.Key)) staleCoordinates.Add(pair.Key);
+        for (int i = 0; i < staleCoordinates.Count; i++) { recycledChunks.Add(chunks[staleCoordinates[i]]); chunks.Remove(staleCoordinates[i]); }
+        foreach (Vector2Int coordinate in requiredCoordinates)
         {
             if (!chunks.TryGetValue(coordinate, out WorldChunk chunk))
             {
-                if (recycled.Count > 0)
+                if (recycledChunks.Count > 0)
                 {
-                    chunk = recycled[recycled.Count - 1];
-                    recycled.RemoveAt(recycled.Count - 1);
+                    chunk = recycledChunks[recycledChunks.Count - 1];
+                    recycledChunks.RemoveAt(recycledChunks.Count - 1);
                 }
                 else
                 {
                     GameObject go = new GameObject("WorldChunk_" + coordinate.x + "_" + coordinate.y);
                     go.transform.SetParent(transform, false); chunk = go.AddComponent<WorldChunk>();
                 }
-                chunk.name = "WorldChunk_" + coordinate.x + "_" + coordinate.y;
                 chunks.Add(coordinate, chunk);
 
-                int layout = Mathf.Abs(coordinate.x * 31 + coordinate.y * 17) % 6;
+                int layout = LayoutForCoordinate(coordinate);
                 chunk.Configure(coordinate, chunkSize, groundMaterial, militaryProps, layout);
             }
         }
+    }
+
+    private static int LayoutForCoordinate(Vector2Int coordinate)
+    {
+        int value = (coordinate.x * 31 + coordinate.y * 17) % 6;
+        return value < 0 ? value + 6 : value;
     }
 
     private void BuildInitialNavigation()

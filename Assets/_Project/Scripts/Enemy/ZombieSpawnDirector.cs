@@ -57,6 +57,10 @@ public sealed class ZombieSpawnDirector : MonoBehaviour
     {
         PlayerMovement playerMovement = FindFirstObjectByType<PlayerMovement>();
         player = playerMovement != null ? playerMovement.transform : null;
+        EnemyVisualVariant.Preload("M24/Male/Prefabs/URP/ZombieMale_AAB_URP");
+        EnemyVisualVariant.Preload("M24/Fat/Fat Zombie(Low Poly)/Prefab/FatZombie", EnemyVisualVariant.MaterialProfile.Fat);
+        if (spawnGiantZombie)
+            EnemyVisualVariant.Preload("M24/Mutant/prefab/SKM_Zombie_Mutant", EnemyVisualVariant.MaterialProfile.Mutant);
         nextSpawnTime = Time.time + initialDelay;
     }
 

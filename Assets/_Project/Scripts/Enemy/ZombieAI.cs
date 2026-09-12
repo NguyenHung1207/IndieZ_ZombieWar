@@ -27,6 +27,9 @@ public sealed class ZombieAI : MonoBehaviour
     private Vector3 knockbackVelocity;
     private ZombieAnimationController animationController;
     private CombatAudio combatAudio;
+    private PlayerHealth targetHealth;
+    private Collider[] colliders;
+    private ZombieDissolve dissolve;
     private float nextVoiceTime;
 
     public bool IsDead => state == State.Dead;
@@ -62,6 +65,8 @@ public sealed class ZombieAI : MonoBehaviour
         health.Hit += HandleHit;
         animationController = GetComponent<ZombieAnimationController>();
         combatAudio = GetComponent<CombatAudio>();
+        colliders = GetComponentsInChildren<Collider>();
+        dissolve = GetComponent<ZombieDissolve>();
 
         agent.speed = moveSpeed;
         agent.stoppingDistance = attackRange;
@@ -69,6 +74,7 @@ public sealed class ZombieAI : MonoBehaviour
         agent.acceleration = 12f;
         agent.autoBraking = true;
         state = State.Chase;
+        nextPathTime = Time.time + Random.Range(0f, 0.2f);
         nextVoiceTime = Time.time + Random.Range(6f, 12f);
     }
 
@@ -79,6 +85,7 @@ public sealed class ZombieAI : MonoBehaviour
             PlayerMovement player = FindFirstObjectByType<PlayerMovement>();
             target = player != null ? player.transform : null;
         }
+        if (target != null) targetHealth = target.GetComponent<PlayerHealth>();
     }
 
     private void Update()
@@ -106,9 +113,9 @@ public sealed class ZombieAI : MonoBehaviour
         Vector3 targetPosition = target.position;
         Vector3 offset = targetPosition - transform.position;
         offset.y = 0f;
-        float distance = offset.magnitude;
+        float attackRangeSqr = attackRange * attackRange;
 
-        if (distance > attackRange)
+        if (offset.sqrMagnitude > attackRangeSqr)
         {
             state = State.Chase;
             if (!agent.isOnNavMesh)
@@ -118,17 +125,17 @@ public sealed class ZombieAI : MonoBehaviour
             if (Time.time >= nextPathTime)
             {
                 agent.SetDestination(targetPosition);
-                nextPathTime = Time.time + 0.1f;
+                nextPathTime = Time.time + 0.2f;
             }
             return;
         }
 
-        state = State.Attack;
-        if (agent.isOnNavMesh)
+        if (state != State.Attack && agent.isOnNavMesh)
         {
             agent.isStopped = true;
             agent.ResetPath();
         }
+        state = State.Attack;
 
         if (offset.sqrMagnitude > 0.001f)
         {
@@ -144,8 +151,7 @@ public sealed class ZombieAI : MonoBehaviour
             nextAttackTime = Time.time + attackCooldown;
             animationController?.PlayAttack();
             combatAudio?.Play(CombatSound.ZombieAttack, 0.38f);
-            IDamageable damageable = target.GetComponent<PlayerHealth>();
-            damageable?.TakeDamage(attackDamage);
+            targetHealth?.TakeDamage(attackDamage);
         }
     }
 
@@ -169,13 +175,11 @@ public sealed class ZombieAI : MonoBehaviour
             agent.ResetPath();
         }
 
-        foreach (Collider collider in GetComponentsInChildren<Collider>())
-            collider.enabled = false;
+        for (int i = 0; i < colliders.Length; i++) colliders[i].enabled = false;
 
         animationController?.PlayDeath();
         combatAudio?.Play(CombatSound.ZombieDeath, 0.75f);
 
-        ZombieDissolve dissolve = GetComponent<ZombieDissolve>();
         if (dissolve != null)
             dissolve.Begin();
         else if (cleanupDelay <= 0f)

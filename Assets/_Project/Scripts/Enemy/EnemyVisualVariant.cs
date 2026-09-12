@@ -1,37 +1,52 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>Presentation-only model swap; gameplay remains on the authoritative Zombie prefab.</summary>
 public sealed class EnemyVisualVariant : MonoBehaviour
 {
     public enum MaterialProfile { None, Mutant, Fat }
+    private static readonly Dictionary<string, GameObject> VisualPrefabs = new Dictionary<string, GameObject>();
+    private static Material mutantMaterial;
+    private static Material fatMaterial;
+
+    public static void Preload(string resourcesPath, MaterialProfile profile = MaterialProfile.None)
+    {
+        LoadVisualPrefab(resourcesPath);
+        if (profile != MaterialProfile.None) GetUrpLitMaterial(profile);
+    }
 
     public void Apply(string resourcesPath, float targetHeightRatio, bool forceUrpLit = false, MaterialProfile profile = MaterialProfile.None)
     {
-        GameObject visualPrefab = Resources.Load<GameObject>(resourcesPath);
+        GameObject visualPrefab = LoadVisualPrefab(resourcesPath);
         if (visualPrefab == null)
             return;
 
-        Bounds normalBounds = GetRendererBounds(GetComponentsInChildren<Renderer>(true));
+        Renderer[] normalRenderers = GetComponentsInChildren<Renderer>(true);
+        Bounds normalBounds = GetRendererBounds(normalRenderers);
 
-        foreach (Renderer renderer in GetComponentsInChildren<Renderer>(true))
-            renderer.enabled = false;
+        for (int i = 0; i < normalRenderers.Length; i++) normalRenderers[i].enabled = false;
 
         GameObject visual = Instantiate(visualPrefab, transform);
         visual.name = "VariantVisual";
         visual.transform.localPosition = Vector3.zero;
         visual.transform.localRotation = Quaternion.identity;
-        Bounds variantBounds = GetRendererBounds(visual.GetComponentsInChildren<Renderer>(true));
+        Renderer[] variantRenderers = visual.GetComponentsInChildren<Renderer>(true);
+        Bounds variantBounds = GetRendererBounds(variantRenderers);
         float normalHeight = Mathf.Max(0.01f, normalBounds.size.y);
         float variantHeight = Mathf.Max(0.01f, variantBounds.size.y);
         float scale = normalHeight * targetHeightRatio / variantHeight;
         visual.transform.localScale = Vector3.one * scale;
-        variantBounds = GetRendererBounds(visual.GetComponentsInChildren<Renderer>(true));
+        variantBounds = GetRendererBounds(variantRenderers);
         visual.transform.position += Vector3.up * (normalBounds.min.y - variantBounds.min.y);
-        foreach (Collider collider in visual.GetComponentsInChildren<Collider>(true))
-            collider.enabled = false;
+        Collider[] variantColliders = visual.GetComponentsInChildren<Collider>(true);
+        for (int i = 0; i < variantColliders.Length; i++) variantColliders[i].enabled = false;
 
         if (forceUrpLit)
-            ApplyUrpLitMaterial(visual, profile);
+        {
+            Material material = GetUrpLitMaterial(profile);
+            if (material != null)
+                for (int i = 0; i < variantRenderers.Length; i++) variantRenderers[i].sharedMaterial = material;
+        }
 
         Animator variantAnimator = visual.GetComponentInChildren<Animator>(true);
         GetComponent<ZombieAnimationController>()?.BindVariantAnimator(variantAnimator);
@@ -50,10 +65,22 @@ public sealed class EnemyVisualVariant : MonoBehaviour
         return bounds;
     }
 
-    private static void ApplyUrpLitMaterial(GameObject visual, MaterialProfile profile)
+    private static GameObject LoadVisualPrefab(string resourcesPath)
     {
+        if (!VisualPrefabs.TryGetValue(resourcesPath, out GameObject prefab))
+        {
+            prefab = Resources.Load<GameObject>(resourcesPath);
+            VisualPrefabs[resourcesPath] = prefab;
+        }
+        return prefab;
+    }
+
+    private static Material GetUrpLitMaterial(MaterialProfile profile)
+    {
+        if (profile == MaterialProfile.Mutant && mutantMaterial != null) return mutantMaterial;
+        if (profile == MaterialProfile.Fat && fatMaterial != null) return fatMaterial;
         Shader shader = Shader.Find("Universal Render Pipeline/Lit");
-        if (shader == null) return;
+        if (shader == null) return null;
         bool fat = profile == MaterialProfile.Fat;
         Texture2D baseMap = Resources.Load<Texture2D>(fat
             ? "M24/Fat/Fat Zombie(Low Poly)/Textures/FatZombie_AlbedoMap"
@@ -66,7 +93,7 @@ public sealed class EnemyVisualVariant : MonoBehaviour
         material.SetTexture("_BumpMap", normalMap);
         material.SetFloat("_Metallic", fat ? 0.05f : 0.1f);
         material.SetFloat("_Smoothness", fat ? 0.3f : 0.38f);
-        foreach (Renderer renderer in visual.GetComponentsInChildren<Renderer>(true))
-            renderer.sharedMaterial = material;
+        if (fat) fatMaterial = material; else mutantMaterial = material;
+        return material;
     }
 }

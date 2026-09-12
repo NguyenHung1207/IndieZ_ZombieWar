@@ -50,12 +50,17 @@ The production project uses selected files from the following Unity Asset Store 
 ## 2D Gui Shooter + Icons
 
 - Source: [2D Gui Shooter + Icons](https://assetstore.unity.com/packages/2d/gui/icons/2d-gui-shooter-icons-328881)
-- Production use: `Icons/Icon_51.png` (Fire), `Icon_36.png` (Reload), `Icon_46.png` (Switch Weapon), `Icon_44.png` (Grenade), and `Icon_61.png` (Health). Demo scene and all unselected PNG assets were excluded.
+- Production action icons: `Icons/Icon_51.png` (Fire), `Icon_36.png` (Reload), `Icon_46.png` (Switch Weapon), `Icon_44.png` (Grenade), and `Icon_61.png` (Health).
+- Production menu/level icons: `Icons/Icon_41.png` (Play), `Icon_55.png` (Shop), `Icon_67.png` (Settings), `Icon_79.png` (Quit/close), `Icon_75.png` (Level 1), and `Icon_76.png` (Level 2).
+- Production UI frames: `Ui/Icon_7.png` (primary button frame), `Ui/Icon_23.png` (compact button frame), `Ui/Icon_25.png` (panel frame), `Ui/Icon_16.png` (wide panel frame), `Ui/Icon_33.png` (action-button frame), `Ui/Icon_34.png` (separator), and `Ui/Icon_31.png` (dark button fill). Demo scene, showcase images, and all other PNG assets are excluded from production.
 
 ## The Wasteland LITE
 
 - Source: [The Wasteland LITE](https://assetstore.unity.com/packages/3d/environments/industrial/the-wasteland-lite-73054)
-- Production use: `Fortified_Wall_1A`, `Wall_Broken_1A`, `Concrete_Block_1A`, and `Barrier_1A`, with their required FBX/material/texture dependencies. Package scenes, scripts, cameras, and legacy settings are excluded; props are decoration only and use no imported colliders.
+- Production fortified structures: `Fortified_Wall_1A`, `Fortified_Wall_1B`, `Fortified_Wall_1C`, `Fortified_Wall_1D`, `Fortified_Wall_2A`, `Fortified_Wall_2B`, `Fortified_Wall_2C`, and `Fortified_Wall_2D`.
+- Production walls/blocks: `Wall_Broken_1A`, `Wall_Broken_1B`, `Wall_Broken_1C`, `Wall_1A_Door`, `Wall_1A_Window_1`, `Wall_1A_Window_2`, and `Concrete_Block_1A` through `Concrete_Block_1F`.
+- Production props: `Barrier_1A`, `Barrier_1B`, `Barrier_1C`, `Awning_2A`, `Awning_2B`, `Shanty_Wall_Board_1A`, `Shanty_Wall_Board_1B`, `Hanging_Tapestry_1A`, and `Hanging_Tapestry_1B`, with their selected FBX and texture dependencies.
+- First-party runtime presentation replaces legacy materials with shared URP/Lit wall, structure, metal, and tapestry materials. Imported colliders are disabled; only explicit project-authored BoxCollider proxies are gameplay-solid. Package scenes, scripts, cameras, effects, and legacy settings are excluded.
 
 ## Zombie Voice Audio Pack Free
 

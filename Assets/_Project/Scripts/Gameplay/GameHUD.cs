@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public sealed class GameHUD : MonoBehaviour
 {
@@ -122,7 +123,7 @@ public sealed class GameHUD : MonoBehaviour
         Transform safe = transform.Find("SafeArea");
         if (safe == null)
             return;
-        GameObject banner = new GameObject("LevelIntro", typeof(RectTransform), typeof(Text));
+        GameObject banner = new GameObject("LevelIntro", typeof(RectTransform), typeof(CanvasGroup), typeof(Text));
         banner.transform.SetParent(safe, false);
         Text text = banner.GetComponent<Text>();
         text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -137,7 +138,22 @@ public sealed class GameHUD : MonoBehaviour
         rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
         rect.anchoredPosition = new Vector2(0f, 160f);
         rect.sizeDelta = new Vector2(620f, 170f);
-        Destroy(banner, 2.5f);
+        StartCoroutine(FadeLevelIntro(banner, banner.GetComponent<CanvasGroup>()));
+    }
+
+    private static IEnumerator FadeLevelIntro(GameObject banner, CanvasGroup group)
+    {
+        const float holdDuration = 1.75f;
+        const float fadeDuration = 0.55f;
+        yield return new WaitForSecondsRealtime(holdDuration);
+        float elapsed = 0f;
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            if (group != null) group.alpha = 1f - Mathf.Clamp01(elapsed / fadeDuration);
+            yield return null;
+        }
+        Destroy(banner);
     }
 
     private void HandleWeaponChanged(WeaponDefinition definition)

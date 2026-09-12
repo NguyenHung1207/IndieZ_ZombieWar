@@ -24,7 +24,8 @@ public static class M20UITheme
 
         Transform topBackdrop = EnsureUI(safe, "TopHUDBackdrop", typeof(Image));
         SetRect((RectTransform)topBackdrop, Vector2.up, Vector2.one, new Vector2(0.5f, 1f), Vector2.zero, new Vector2(0f, 118f));
-        StyleImage(topBackdrop.GetComponent<Image>(), null, new Color(0.018f, 0.024f, 0.029f, 0.56f));
+        StyleImage(topBackdrop.GetComponent<Image>(), null, new Color(0.018f, 0.024f, 0.027f, 0.72f));
+        topBackdrop.GetComponent<Image>().preserveAspect = false;
         topBackdrop.SetAsFirstSibling();
 
         Text health = GetText(safe, "HealthText");
@@ -78,29 +79,36 @@ public static class M20UITheme
         if (safe == null || safe.Find("M20ThemeApplied") != null) return;
         ConfigureCanvas(canvas);
         MarkApplied(safe);
+        Image safeBackdrop = safe.GetComponent<Image>();
+        if (safeBackdrop != null)
+        {
+            safeBackdrop.color = Color.clear;
+            safeBackdrop.raycastTarget = false;
+        }
 
         Transform menu = safe.Find("MenuPanel");
         if (menu == null) return;
-        SetRect((RectTransform)menu, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.zero, new Vector2(820f, 580f));
-        menu.GetComponent<Image>().color = new Color(0.025f, 0.035f, 0.04f, 0.78f);
+        SetRect((RectTransform)menu, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(-470f, 0f), new Vector2(650f, 880f));
+        StylePanel(menu, null, new Color(0.018f, 0.024f, 0.028f, 0.86f));
         Outline menuOutline = GetOrAdd<Outline>(menu.gameObject);
         menuOutline.effectColor = new Color(0.32f, 0.035f, 0.035f, 0.9f);
         menuOutline.effectDistance = new Vector2(3f, -3f);
         Image accent = GetImage(menu, "Accent");
-        StyleImage(accent, null, Red);
+        StyleImage(accent, null, Gold);
+        SetRect(accent.rectTransform, Vector2.zero, Vector2.up, new Vector2(0f, 0.5f), new Vector2(0f, 0f), new Vector2(7f, 0f));
 
         Text title = GetText(menu, "Title");
-        StyleText(title, 82, TextAnchor.MiddleCenter, Color.white, FontStyle.Bold);
-        SetRect(title.rectTransform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(0f, 178f), new Vector2(760f, 100f));
+        StyleText(title, 76, TextAnchor.MiddleLeft, Color.white, FontStyle.Bold);
+        SetRect(title.rectTransform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(28f, 320f), new Vector2(530f, 92f));
         Text subtitle = GetText(menu, "Subtitle");
-        StyleText(subtitle, 27, TextAnchor.MiddleCenter, Muted, FontStyle.Bold);
-        SetRect(subtitle.rectTransform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(0f, 110f), new Vector2(720f, 48f));
-        ConfigureMenuButton(menu.Find("PlayButton"), new Vector2(0f, 28f), Red, 32);
-        ConfigureMenuButton(menu.Find("ShopButton"), new Vector2(0f, -70f), new Color(0.13f, 0.16f, 0.18f, 0.96f), 30);
-        ConfigureMenuButton(menu.Find("QuitButton"), new Vector2(0f, -168f), new Color(0.075f, 0.085f, 0.095f, 0.9f), 28);
+        StyleText(subtitle, 24, TextAnchor.MiddleLeft, Muted, FontStyle.Bold);
+        SetRect(subtitle.rectTransform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(28f, 260f), new Vector2(530f, 42f));
+        ConfigureMenuButton(menu.Find("PlayButton"), new Vector2(28f, 154f), Red, 33, "Play", new Vector2(500f, 86f));
+        ConfigureMenuButton(menu.Find("ShopButton"), new Vector2(28f, 50f), new Color(0.13f, 0.16f, 0.18f, 0.96f), 29, "Shop", new Vector2(500f, 76f));
+        ConfigureMenuButton(menu.Find("QuitButton"), new Vector2(28f, -158f), new Color(0.075f, 0.085f, 0.095f, 0.82f), 25, "Quit", new Vector2(500f, 68f));
         Text footer = GetText(menu, "Footer");
         StyleText(footer, 18, TextAnchor.MiddleCenter, new Color(0.58f, 0.62f, 0.64f), FontStyle.Normal);
-        SetRect(footer.rectTransform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(0f, -258f), new Vector2(720f, 30f));
+        SetRect(footer.rectTransform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(28f, -350f), new Vector2(530f, 30f));
 
         Text mainCoins = GetText(safe, "CurrencyText");
         Transform menuCurrency = EnsureUI(safe, "MenuCurrencyPanel", typeof(Image));
@@ -116,6 +124,35 @@ public static class M20UITheme
         currencyHud.Configure(mainCoins);
 
         ConfigureShop(safe, shopController);
+    }
+
+    public static void ApplyRuntimeMainMenuPanels(Transform safe)
+    {
+        if (safe == null) return;
+        Transform menu = safe.Find("MenuPanel");
+        ConfigureMenuButton(menu != null ? menu.Find("SettingsButton") : null, new Vector2(28f, -50f), new Color(0.13f, 0.16f, 0.18f, 0.96f), 28, "Settings", new Vector2(500f, 76f));
+        ConfigureMenuButton(menu != null ? menu.Find("QuitButton") : null, new Vector2(28f, -150f), new Color(0.075f, 0.085f, 0.095f, 0.82f), 25, "Quit", new Vector2(500f, 68f));
+
+        Transform levelSelect = safe.Find("LevelSelectPanel");
+        if (levelSelect != null)
+        {
+            StylePanel(levelSelect, "PanelFrame", Color.white);
+            AddTacticalShade(levelSelect);
+            AddHeaderSeparator(levelSelect);
+            StyleRuntimeButton(levelSelect.Find("LEVEL 1Button"), "Level1", new Color(0.86f, 0.92f, 1f, 1f));
+            StyleRuntimeButton(levelSelect.Find("LEVEL 2Button"), "Level2", new Color(1f, 0.86f, 0.82f, 1f));
+            StyleRuntimeButton(levelSelect.Find("BACKButton"), null, Color.white);
+        }
+
+        Transform settings = safe.Find("SettingsPanel");
+        if (settings != null)
+        {
+            StylePanel(settings, "PanelFrame", Color.white);
+            AddTacticalShade(settings);
+            AddHeaderSeparator(settings);
+            foreach (Button button in settings.GetComponentsInChildren<Button>(true))
+                StyleButton(button, new Color(0.13f, 0.16f, 0.18f, 0.96f), false);
+        }
     }
 
     private static void ConfigureJoystick(Transform safe)
@@ -142,10 +179,10 @@ public static class M20UITheme
         Transform actions = safe.Find("ActionControls");
         if (actions == null) return;
         SetRect((RectTransform)actions, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-26f, 26f), new Vector2(450f, 292f));
-        ConfigureActionButton(actions.Find("FireButton"), "Fire", Red, new Vector2(288f, 0f), 156f, "FIRE");
-        ConfigureActionButton(actions.Find("GrenadeButton"), "Grenade", OrangeRed, new Vector2(96f, 18f), 118f, string.Empty);
+        ConfigureActionButton(actions.Find("FireButton"), "Fire", Red, new Vector2(288f, 0f), 150f, string.Empty);
+        ConfigureActionButton(actions.Find("GrenadeButton"), "Grenade", OrangeRed, new Vector2(96f, 18f), 115f, string.Empty);
         ConfigureActionButton(actions.Find("ReloadButton"), "Reload", new Color(0.12f, 0.15f, 0.17f, 0.9f), new Vector2(208f, 145f), 100f, string.Empty);
-        ConfigureActionButton(actions.Find("SwitchButton"), "SwitchWeapon", new Color(0.12f, 0.15f, 0.17f, 0.9f), new Vector2(326f, 182f), 98f, string.Empty);
+        ConfigureActionButton(actions.Find("SwitchButton"), "SwitchWeapon", new Color(0.12f, 0.15f, 0.17f, 0.9f), new Vector2(326f, 182f), 100f, string.Empty);
 
         PlayerGrenadeController grenades = UnityEngine.Object.FindFirstObjectByType<PlayerGrenadeController>();
         Transform grenadeTransform = actions.Find("GrenadeButton");
@@ -171,11 +208,13 @@ public static class M20UITheme
     {
         if (transform == null) return;
         SetRect((RectTransform)transform, Vector2.zero, Vector2.zero, Vector2.zero, position, Vector2.one * size);
-        Image image = transform.GetComponent<Image>();
-        image.sprite = Sprite("CircleFill");
         StyleButton(transform.GetComponent<Button>(), background, true);
+        Image ring = CreateIcon(transform, "Ring", Sprite("CircleRing"), new Color(background.r, background.g, background.b, 0.72f));
+        Stretch(ring.rectTransform, new Vector2(3f, 3f), new Vector2(-3f, -3f));
+        ring.raycastTarget = false;
+        ring.transform.SetAsFirstSibling();
         Image icon = CreateIcon(transform, "Icon", ShooterSprite(iconName) ?? Sprite(iconName), Color.white);
-        SetRect(icon.rectTransform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(0f, string.IsNullOrEmpty(labelText) ? 0f : 8f), Vector2.one * (size * 0.47f));
+        SetRect(icon.rectTransform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.zero, Vector2.one * (size * 0.47f));
         Text label = GetText(transform, "Label");
         if (label == null) label = GetText(transform, "Text");
         if (label != null)
@@ -206,7 +245,7 @@ public static class M20UITheme
         pausePanel.GetComponent<Image>().color = new Color(0.01f, 0.012f, 0.015f, 0.78f);
         Transform card = EnsureUI(pausePanel, "PauseCard", typeof(Image), typeof(Outline));
         SetRect((RectTransform)card, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.zero, new Vector2(520f, 370f));
-        card.GetComponent<Image>().color = Panel;
+        StylePanel(card, "WidePanelFrame", Color.white);
         Outline outline = card.GetComponent<Outline>();
         outline.effectColor = new Color(0.65f, 0.07f, 0.07f, 0.9f);
         outline.effectDistance = new Vector2(3f, -3f);
@@ -235,7 +274,7 @@ public static class M20UITheme
         Transform result = safe.Find("ResultPanel");
         if (result == null) return null;
         SetRect((RectTransform)result, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.zero, new Vector2(680f, 410f));
-        result.GetComponent<Image>().color = Panel;
+        StylePanel(result, "WidePanelFrame", Color.white);
         Outline outline = GetOrAdd<Outline>(result.gameObject);
         outline.effectColor = new Color(0.66f, 0.07f, 0.07f, 0.9f);
         outline.effectDistance = new Vector2(3f, -3f);
@@ -267,18 +306,21 @@ public static class M20UITheme
     {
         Transform shop = safe.Find("ShopPanel");
         if (shop == null) return;
-        shop.GetComponent<Image>().color = new Color(0.012f, 0.018f, 0.022f, 0.95f);
+        shop.GetComponent<Image>().color = new Color(0.012f, 0.018f, 0.022f, 0.97f);
+        shop.GetComponent<Image>().raycastTarget = false;
+        Transform shopFrame = shop.Find("ShooterPackFrame");
+        if (shopFrame != null) shopFrame.gameObject.SetActive(false);
         Transform header = EnsureUI(shop, "Header", typeof(Image));
-        SetRect((RectTransform)header, Vector2.up, Vector2.one, new Vector2(0.5f, 1f), Vector2.zero, new Vector2(0f, 104f));
+        SetRect((RectTransform)header, Vector2.up, Vector2.one, new Vector2(0.5f, 1f), Vector2.zero, new Vector2(0f, 88f));
         header.GetComponent<Image>().color = new Color(0.035f, 0.045f, 0.052f, 0.96f);
         header.SetAsFirstSibling();
 
         Text title = GetText(shop, "ShopTitle");
         StyleText(title, 42, TextAnchor.MiddleCenter, Color.white, FontStyle.Bold);
-        SetRect(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -18f), new Vector2(520f, 60f));
+        SetRect(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -10f), new Vector2(520f, 56f));
         Text feedback = GetText(shop, "ShopFeedback");
         StyleText(feedback, 22, TextAnchor.MiddleCenter, Gold, FontStyle.Bold);
-        SetRect(feedback.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -78f), new Vector2(700f, 34f));
+        SetRect(feedback.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -62f), new Vector2(700f, 30f));
         Transform back = shop.Find("BackButton");
         SetRect((RectTransform)back, Vector2.up, Vector2.up, Vector2.up, new Vector2(30f, -22f), new Vector2(150f, 60f));
         StyleButton(back.GetComponent<Button>(), new Color(0.12f, 0.145f, 0.16f, 0.98f), false);
@@ -306,9 +348,15 @@ public static class M20UITheme
         {
             Transform card = shop.Find(names[i]);
             if (card == null) continue;
-            SetRect((RectTransform)card, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2((i - 2) * 300f, -12f), new Vector2(282f, 552f));
+            SetRect((RectTransform)card, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2((i - 2) * 300f, 78f), new Vector2(282f, 530f));
             backgrounds[i] = card.GetComponent<Image>();
-            backgrounds[i].color = new Color(0.075f, 0.09f, 0.105f, 0.98f);
+            backgrounds[i].sprite = Sprite("Solid");
+            backgrounds[i].color = new Color(0.10f, 0.12f, 0.135f, 0.98f);
+            backgrounds[i].preserveAspect = false;
+            backgrounds[i].raycastTarget = false;
+            Outline cardOutline = GetOrAdd<Outline>(card.gameObject);
+            cardOutline.effectColor = new Color(0.18f, 0.20f, 0.22f, 0.9f);
+            cardOutline.effectDistance = new Vector2(2f, -2f);
             accents[i] = CreateIcon(card, "StateAccent", "Solid", new Color(0.27f, 0.29f, 0.31f));
             SetRect(accents[i].rectTransform, Vector2.up, Vector2.one, new Vector2(0.5f, 1f), Vector2.zero, new Vector2(0f, 7f));
 
@@ -318,31 +366,32 @@ public static class M20UITheme
             SetRect(name.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -18f), new Vector2(250f, 42f));
 
             Transform preview = card.Find("WeaponPreview");
-            Transform frame = EnsureUI(card, "PreviewFrame", typeof(Image));
-            SetRect((RectTransform)frame, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -64f), new Vector2(252f, 150f));
-            frame.GetComponent<Image>().color = new Color(0.018f, 0.024f, 0.03f, 0.86f);
+            Transform frame = EnsureUI(card, "PreviewFrame", typeof(Image), typeof(RectMask2D));
+            SetRect((RectTransform)frame, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -64f), new Vector2(264f, 190f));
+            frame.GetComponent<Image>().color = new Color(0.006f, 0.009f, 0.012f, 0.98f);
+            frame.GetComponent<Image>().raycastTarget = false;
             preview.SetParent(frame, false);
             Image previewImage = preview.GetComponent<Image>();
             previewImage.color = Color.white;
             previewImage.preserveAspect = true;
             previewImage.raycastTarget = false;
-            Stretch((RectTransform)preview, new Vector2(9f, 9f), new Vector2(-9f, -9f));
+            Stretch((RectTransform)preview, new Vector2(-55f, -28f), new Vector2(55f, 28f));
 
             Text role = EnsureText(card, "Role");
             role.text = roles[i];
             StyleText(role, 16, TextAnchor.MiddleCenter, new Color(0.78f, 0.81f, 0.83f), FontStyle.Bold);
-            SetRect(role.rectTransform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(0f, 52f), new Vector2(250f, 30f));
+            SetRect(role.rectTransform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(0f, 8f), new Vector2(250f, 28f));
 
             Transform infoTransform = card.Find("Info") ?? card.Find("Stats");
             infoTransform.gameObject.name = "Stats";
             Text info = infoTransform.GetComponent<Text>();
-            StyleText(info, 18, TextAnchor.MiddleLeft, new Color(0.88f, 0.90f, 0.92f), FontStyle.Normal);
-            SetRect(info.rectTransform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(0f, -38f), new Vector2(218f, 142f));
+            StyleText(info, 17, TextAnchor.MiddleLeft, new Color(0.78f, 0.82f, 0.85f), FontStyle.Normal);
+            SetRect(info.rectTransform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(0f, -68f), new Vector2(218f, 126f));
             infos[i] = info;
 
             Text state = EnsureText(card, "State");
             StyleText(state, 17, TextAnchor.MiddleCenter, Gold, FontStyle.Bold);
-            SetRect(state.rectTransform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(0f, -132f), new Vector2(240f, 32f));
+            SetRect(state.rectTransform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(0f, -143f), new Vector2(240f, 30f));
             states[i] = state;
 
             Transform buy = card.Find("BuyButton");
@@ -353,19 +402,26 @@ public static class M20UITheme
             SetRect(priceIcons[i].rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(12f, 0f), new Vector2(24f, 24f));
 
             Transform equip = card.Find("EquipButton");
-            SetRect((RectTransform)equip, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(0f, -241f), new Vector2(232f, 44f));
+            SetRect((RectTransform)equip, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(0f, -231f), new Vector2(232f, 44f));
             StyleButton(equip.GetComponent<Button>(), new Color(0.14f, 0.17f, 0.19f, 0.98f), false);
             StyleButtonLabel(equip, 18);
         }
         controller.ConfigurePresentation(shopCoins, infos, states, backgrounds, accents, priceIcons);
     }
 
-    private static void ConfigureMenuButton(Transform transform, Vector2 position, Color color, int fontSize)
+    private static void ConfigureMenuButton(Transform transform, Vector2 position, Color color, int fontSize, string iconName, Vector2? requestedSize = null)
     {
         if (transform == null) return;
-        SetRect((RectTransform)transform, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, position, new Vector2(370f, 78f));
+        SetRect((RectTransform)transform, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(0.5f, 0.5f), position, requestedSize ?? new Vector2(370f, 78f));
         StyleButton(transform.GetComponent<Button>(), color, false);
         StyleButtonLabel(transform, fontSize);
+        if (!string.IsNullOrEmpty(iconName))
+        {
+            Image icon = CreateIcon(transform, "ShooterIcon", ShooterSprite(iconName), Color.white);
+            SetRect(icon.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(26f, 0f), new Vector2(46f, 46f));
+            Text label = transform.GetComponentInChildren<Text>(true);
+            if (label != null) Stretch(label.rectTransform, new Vector2(78f, 0f), new Vector2(-18f, 0f));
+        }
     }
 
     private static void ConfigureCanvas(Canvas canvas)
@@ -383,8 +439,11 @@ public static class M20UITheme
     {
         if (button == null) return;
         Image image = button.GetComponent<Image>();
-        image.color = color;
-        if (circular) { image.sprite = Sprite("CircleFill"); image.preserveAspect = true; }
+        Sprite packSprite = circular ? Sprite("CircleFill") : ShooterSprite("ButtonFrame");
+        image.sprite = packSprite != null ? packSprite : image.sprite;
+        image.color = circular ? new Color(0.025f, 0.032f, 0.04f, 0.88f) : (packSprite != null ? Color.white : color);
+        image.preserveAspect = circular;
+        image.raycastTarget = true;
         button.targetGraphic = image;
         button.transition = Selectable.Transition.ColorTint;
         ColorBlock colors = button.colors;
@@ -398,6 +457,34 @@ public static class M20UITheme
         GetOrAdd<UIButtonPressFeedback>(button.gameObject);
     }
 
+    private static void StylePanel(Transform panel, string spriteName, Color color)
+    {
+        if (panel == null) return;
+        Image image = panel.GetComponent<Image>();
+        if (image == null) image = panel.gameObject.AddComponent<Image>();
+        image.sprite = ShooterSprite(spriteName);
+        image.color = color;
+        image.preserveAspect = false;
+        image.raycastTarget = false;
+    }
+
+    private static void AddHeaderSeparator(Transform panel)
+    {
+        Transform separator = EnsureUI(panel, "ShooterHeaderSeparator", typeof(Image));
+        SetRect((RectTransform)separator, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -96f), new Vector2(560f, 8f));
+        StyleImage(separator.GetComponent<Image>(), ShooterSprite("Separator"), Color.white);
+        separator.GetComponent<Image>().preserveAspect = false;
+    }
+
+    private static void StyleRuntimeButton(Transform transform, string iconName, Color iconColor)
+    {
+        if (transform == null) return;
+        StyleButton(transform.GetComponent<Button>(), new Color(0.12f, 0.15f, 0.17f, 0.96f), false);
+        if (string.IsNullOrEmpty(iconName)) return;
+        Image icon = CreateIcon(transform, "ShooterIcon", ShooterSprite(iconName), iconColor);
+        SetRect(icon.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(34f, 0f), new Vector2(76f, 76f));
+    }
+
     private static void StyleButtonLabel(Transform button, int fontSize)
     {
         Text label = button.GetComponentInChildren<Text>(true);
@@ -405,6 +492,15 @@ public static class M20UITheme
         label.gameObject.SetActive(true);
         StyleText(label, fontSize, TextAnchor.MiddleCenter, Color.white, FontStyle.Bold);
         Stretch(label.rectTransform, Vector2.zero, Vector2.zero);
+    }
+
+    private static void AddTacticalShade(Transform panel)
+    {
+        Transform shade = EnsureUI(panel, "TacticalShade", typeof(Image));
+        Stretch((RectTransform)shade, new Vector2(5f, 5f), new Vector2(-5f, -5f));
+        shade.GetComponent<Image>().color = new Color(0.018f, 0.022f, 0.025f, 0.91f);
+        shade.GetComponent<Image>().raycastTarget = false;
+        shade.SetAsFirstSibling();
     }
 
     private static void StyleText(Text text, int size, TextAnchor alignment, Color color, FontStyle style)
