@@ -1,20 +1,20 @@
 # ZOMBIE WAR
 
-Zombie War is a top-down survival game for desktop testing and landscape Android play. Survive three-minute runs across two distinct battlefields, defeat Zombies, collect loot, and manage a persistent two-slot weapon loadout.
+Zombie War is a top-down survival shooter for desktop and landscape Android. Survive three-minute runs across two distinct battlefields, defeat zombie hordes, collect loot and coins, and manage a persistent two-slot weapon loadout.
 
 ## Features
 
 - Two 3-minute survival levels with Victory and Game Over
 - Cinemachine top-down camera
-- Infinite recycled military battlefield in Level 1
-- Authored slope-based stronghold battlefield in Level 2
+- Level 1: flat, infinite recycled battlefield
+- Level 2: slope-based stronghold battlefield with a Giant Zombie encounter
 - Five weapons with persistent Shop and two-slot loadout
 - Coins, loot drops, ammo, reload, recoil, muzzle VFX, tracers, and spatial audio
 - 360-degree automatic target aiming
 - Physics grenade with explosion damage, knockback, and cooldown
-- Multiple Zombie variants, including Male, Fat, and Giant Mutant enemies
+- Multiple zombie variants, including Male, Fat, and Giant Zombie enemies
 - NavMesh Zombie chase/attack behavior with hit, death, dissolve, VFX, and audio
-- Responsive Safe Area-aware mobile joystick and action controls
+- Safe Area-aware mobile joystick plus Fire, Reload, Switch, Grenade, and Pause controls
 - Main Menu, Level Select, Shop, Settings, Pause, Victory, and Game Over flows
 
 ## Controls

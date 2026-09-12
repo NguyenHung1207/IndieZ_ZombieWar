@@ -25,7 +25,7 @@ public sealed class ShopController : MonoBehaviour
 
     private void Start()
     {
-        M20UITheme.ApplyMainMenu(this);
+        UiTheme.ApplyMainMenu(this);
         wallet = FindFirstObjectByType<CurrencyWallet>();
         if (shopButton != null) shopButton.onClick.AddListener(OpenShop); else CreateShopButtonFallback();
         if (backButton != null) backButton.onClick.AddListener(CloseShop);

@@ -26,9 +26,7 @@ public sealed class MainMenuController : MonoBehaviour
 
     public void QuitGame()
     {
-#if UNITY_EDITOR
-        Debug.Log("Quit requested from Main Menu (ignored in the Editor).");
-#else
+#if !UNITY_EDITOR
         Application.Quit();
 #endif
     }
@@ -50,7 +48,7 @@ public sealed class MainMenuController : MonoBehaviour
         levelSelectPanel.SetActive(false);
         settingsPanel = BuildSettings(safeArea);
         settingsPanel.SetActive(false);
-        M20UITheme.ApplyRuntimeMainMenuPanels(safeArea);
+        UiTheme.ApplyRuntimeMainMenuPanels(safeArea);
     }
 
     private void ShowLevelSelect()

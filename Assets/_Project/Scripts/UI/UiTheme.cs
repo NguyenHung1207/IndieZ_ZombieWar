@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-public static class M20UITheme
+public static class UiTheme
 {
     private static readonly Font UiFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
     private static readonly Color Panel = new Color(0.055f, 0.068f, 0.078f, 0.94f);
@@ -15,7 +15,7 @@ public static class M20UITheme
     public static void ApplyGameplay(Transform hud, GameHUD gameHud)
     {
         Transform safe = hud.Find("SafeArea");
-        if (safe == null || safe.Find("M20ThemeApplied") != null) return;
+        if (safe == null || safe.Find("UiThemeApplied") != null) return;
         ConfigureCanvas(hud.GetComponent<Canvas>());
         MarkApplied(safe);
 
@@ -76,7 +76,7 @@ public static class M20UITheme
         Canvas canvas = UnityEngine.Object.FindFirstObjectByType<Canvas>();
         if (canvas == null) return;
         Transform safe = canvas.transform.Find("SafeArea");
-        if (safe == null || safe.Find("M20ThemeApplied") != null) return;
+        if (safe == null || safe.Find("UiThemeApplied") != null) return;
         ConfigureCanvas(canvas);
         MarkApplied(safe);
         Image safeBackdrop = safe.GetComponent<Image>();
@@ -565,7 +565,7 @@ public static class M20UITheme
 
     private static void MarkApplied(Transform safe)
     {
-        Transform marker = EnsureUI(safe, "M20ThemeApplied");
+        Transform marker = EnsureUI(safe, "UiThemeApplied");
         marker.gameObject.SetActive(false);
     }
 

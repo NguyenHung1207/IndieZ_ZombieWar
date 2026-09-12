@@ -28,7 +28,7 @@ public sealed class GameHUD : MonoBehaviour
 
     private void Start()
     {
-        M20UITheme.ApplyGameplay(transform, this);
+        UiTheme.ApplyGameplay(transform, this);
         session = GameSession.Instance;
         playerHealth = FindFirstObjectByType<PlayerHealth>();
         weaponController = FindFirstObjectByType<PlayerWeaponController>();

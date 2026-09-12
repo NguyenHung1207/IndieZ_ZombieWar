@@ -27,11 +27,6 @@ The production project uses selected files from the following Unity Asset Store 
 - Source: [Military FREE Low Poly 3D Models](https://assetstore.unity.com/packages/3d/environments/military-free-260358)
 - Production use: military environment meshes, materials, and props used by the recycled battlefield. Demo scenes and conversion packages are not production scenes.
 
-## FREE Shirtless Zombie
-
-- Source: [FREE Shirtless Zombie](https://assetstore.unity.com/packages/3d/characters/humanoids/free-shirtless-zombie-276762)
-- Intake use: URP model, materials, textures, and prefabs retained for future zombie visual variants. No package animation clips were present.
-
 ## Zombie Mutant Free
 
 - Source: [Zombie Mutant Free](https://assetstore.unity.com/packages/3d/characters/humanoids/zombie-mutant-free-310842)
