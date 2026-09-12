@@ -1,20 +1,25 @@
 # ZOMBIE WAR
 
-Zombie War is a top-down survival game for desktop testing and landscape Android play. Survive a three-minute run across an infinite recycled battlefield, defeat Zombies, collect loot, and manage a persistent two-slot weapon loadout.
+Zombie War is a top-down survival game for desktop testing and landscape Android play. Survive three-minute runs across two distinct battlefields, defeat Zombies, collect loot, and manage a persistent two-slot weapon loadout.
 
 ## Features
 
-- 3-minute top-down survival run with Victory and Game Over
-- Cinemachine camera and an infinite recycled military battlefield
-- Five weapons, persistent weapon Shop, coins, and loot drops
-- Ammo, reload, recoil, muzzle VFX, spatial audio, and 360-degree auto aim
-- Physics grenade with explosion damage, knockback, and an 8-second cooldown
+- Two 3-minute survival levels with Victory and Game Over
+- Cinemachine top-down camera
+- Infinite recycled military battlefield in Level 1
+- Authored slope-based stronghold battlefield in Level 2
+- Five weapons with persistent Shop and two-slot loadout
+- Coins, loot drops, ammo, reload, recoil, muzzle VFX, tracers, and spatial audio
+- 360-degree automatic target aiming
+- Physics grenade with explosion damage, knockback, and cooldown
+- Multiple Zombie variants, including Male, Fat, and Giant Mutant enemies
 - NavMesh Zombie chase/attack behavior with hit, death, dissolve, VFX, and audio
 - Responsive Safe Area-aware mobile joystick and action controls
+- Main Menu, Level Select, Shop, Settings, Pause, Victory, and Game Over flows
 
 ## Controls
 
-Desktop:
+### Desktop
 
 - WASD — Move
 - Mouse0 — Fire
@@ -23,7 +28,7 @@ Desktop:
 - G — Throw grenade
 - Escape — Pause
 
-Mobile:
+### Mobile
 
 - Joystick — Move
 - Fire — Fire
@@ -34,15 +39,40 @@ Mobile:
 
 ## Build
 
-Use Unity `6000.3.15f1` with Android Build Support, SDK/NDK Tools, and OpenJDK. The release build command is **Build > Zombie War > Build Android APK** and writes:
+Use Unity `6000.3.15f1` with:
+
+- Android Build Support
+- Android SDK & NDK Tools
+- OpenJDK
+
+The release build command is:
+
+`Build > Zombie War > Build Android APK`
+
+Output:
 
 `Builds/Android/ZombieWar.apk`
 
-Release settings: `com.indiez.zombiewar`, version `1.0.0` / code `1`, IL2CPP, ARM64, landscape-only, with Development Build, Script Debugging, and Autoconnect Profiler disabled.
+Release configuration:
 
-Production scenes, in order:
+- Application ID: `com.indiez.zombiewar`
+- Version: `1.0.0`
+- Version Code: `1`
+- Scripting Backend: IL2CPP
+- Architecture: ARM64
+- Orientation: Landscape only
+- Development Build: Disabled
+- Script Debugging: Disabled
+- Autoconnect Profiler: Disabled
+
+## Production Scenes
 
 1. `Assets/_Project/Scenes/MainMenu.unity`
 2. `Assets/_Project/Scenes/Gameplay_Level01.unity`
+3. `Assets/_Project/Scenes/Gameplay_Level02.unity`
 
-Third-party production dependencies and sources are documented in [THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md). The release evidence and device/video checklist are in [SUBMISSION_CHECKLIST.md](SUBMISSION_CHECKLIST.md).
+## Third-Party Assets
+
+Third-party production dependencies and their sources are documented in:
+
+[THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md)
