@@ -4,31 +4,38 @@ using UnityEngine.EventSystems;
 public sealed class FireHoldButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
 {
     [SerializeField] private PlayerWeaponController weaponController;
+    private int pointerId = int.MinValue;
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (pointerId != int.MinValue)
+            return;
+
+        pointerId = eventData.pointerId;
         weaponController?.SetFireHeld(true);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        Release();
+        Release(eventData.pointerId);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (eventData.pointerId < 0)
-            return;
-        Release();
+        Release(eventData.pointerId);
     }
 
     private void OnDisable()
     {
-        Release();
+        Release(pointerId);
     }
 
-    private void Release()
+    private void Release(int releasedPointerId)
     {
+        if (releasedPointerId != pointerId)
+            return;
+
+        pointerId = int.MinValue;
         weaponController?.SetFireHeld(false);
     }
 }

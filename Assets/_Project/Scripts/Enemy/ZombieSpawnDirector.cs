@@ -24,6 +24,11 @@ public sealed class ZombieSpawnDirector : MonoBehaviour
     [SerializeField, Min(0.1f)] private float giantDamage = 28f;
 
     private readonly List<ZombieAI> activeZombies = new List<ZombieAI>();
+    private static readonly Collider[] SpawnOverlapResults = new Collider[16];
+    private const int SpawnAttempts = 16;
+    private const float SpawnFootprintRadius = 0.42f;
+    private const float SpawnFootprintBaseHeight = 0.50f;
+    private const float SpawnFootprintTopHeight = 1.30f;
     private Transform player;
     private float nextSpawnTime;
     private bool giantSpawned;
@@ -41,15 +46,24 @@ public sealed class ZombieSpawnDirector : MonoBehaviour
         // a scene prefab is duplicated or its serialized values are stale.
         if (SceneManager.GetActiveScene().name == "Gameplay_Level02")
         {
-            startInterval = 2f;
-            firstMinuteEndInterval = 1.3f;
-            secondMinuteEndInterval = 0.8f;
-            endInterval = 0.8f;
+            maxActiveZombies = 34;
+            startInterval = 1.55f;
+            firstMinuteEndInterval = 1.05f;
+            secondMinuteEndInterval = 0.65f;
+            endInterval = 0.5f;
             spawnGiantZombie = true;
             giantSpawnTime = 130f;
             giantHealth = 1500f;
             giantSpeed = 2.2f;
             giantDamage = 28f;
+        }
+        else
+        {
+            maxActiveZombies = 30;
+            startInterval = 1.85f;
+            firstMinuteEndInterval = 1.3f;
+            secondMinuteEndInterval = 0.85f;
+            endInterval = 0.65f;
         }
     }
 
@@ -132,11 +146,13 @@ public sealed class ZombieSpawnDirector : MonoBehaviour
 
     private void SpawnZombie(SpawnKind kind)
     {
-        for (int attempt = 0; attempt < 16; attempt++)
+        for (int attempt = 0; attempt < SpawnAttempts; attempt++)
         {
             Vector2 ring = Random.insideUnitCircle.normalized * Random.Range(minimumSpawnRadius, maximumSpawnRadius);
             Vector3 candidate = player.position + new Vector3(ring.x, 0f, ring.y);
             if (!NavMesh.SamplePosition(candidate, out NavMeshHit hit, 4f, NavMesh.AllAreas))
+                continue;
+            if (!IsValidSpawnPosition(hit.position))
                 continue;
 
             ZombieAI zombie = Instantiate(zombiePrefab, hit.position, Quaternion.LookRotation(player.position - hit.position, Vector3.up));
@@ -165,6 +181,67 @@ public sealed class ZombieSpawnDirector : MonoBehaviour
             activeZombies.Add(zombie);
             return;
         }
+
+        // A blocked ring is not an excuse to place an enemy in scenery. The
+        // next scheduled spawn will retry with a new bounded set of candidates.
+    }
+
+    private bool IsValidSpawnPosition(Vector3 position)
+    {
+        if ((position - player.position).sqrMagnitude < minimumSpawnRadius * minimumSpawnRadius)
+            return false;
+
+        // An overlap at standing height rejects walls, boxes, tents, vehicles,
+        // and explicit environment collision proxies, while leaving the NavMesh
+        // support surface itself alone.
+        Vector3 capsuleBottom = position + Vector3.up * SpawnFootprintBaseHeight;
+        Vector3 capsuleTop = position + Vector3.up * SpawnFootprintTopHeight;
+        int overlapCount = Physics.OverlapCapsuleNonAlloc(
+            capsuleBottom, capsuleTop, SpawnFootprintRadius, SpawnOverlapResults, ~0, QueryTriggerInteraction.Ignore);
+        for (int index = 0; index < overlapCount; index++)
+        {
+            Collider collider = SpawnOverlapResults[index];
+            if (IsSolidEnvironmentCollider(collider))
+                return false;
+        }
+
+        // NavMesh can be present over a prop top. Check the immediate support
+        // below the sampled point as well, but permit authored floors, ramps,
+        // and elevated Level 2 combat platforms.
+        if (Physics.Raycast(position + Vector3.up * 1.6f, Vector3.down, out RaycastHit supportHit,
+                2.1f, ~0, QueryTriggerInteraction.Ignore) && IsSolidEnvironmentCollider(supportHit.collider))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static bool IsSolidEnvironmentCollider(Collider collider)
+    {
+        if (collider == null || !collider.enabled || collider.isTrigger)
+            return false;
+        if (collider.GetComponentInParent<ZombieAI>() != null || collider.GetComponentInParent<PlayerMovement>() != null)
+            return false;
+
+        string hierarchyName = string.Empty;
+        for (Transform current = collider.transform; current != null; current = current.parent)
+        {
+            hierarchyName += current.name + " ";
+            if (current.name.IndexOf("_Collision", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                return true;
+        }
+
+        // These are deliberate traversable surfaces created by Level 2. Their
+        // colliders are valid support for spawns on slopes and high ground.
+        return hierarchyName.IndexOf("Ground", System.StringComparison.OrdinalIgnoreCase) < 0 &&
+               hierarchyName.IndexOf("Floor", System.StringComparison.OrdinalIgnoreCase) < 0 &&
+               hierarchyName.IndexOf("Terrain", System.StringComparison.OrdinalIgnoreCase) < 0 &&
+               hierarchyName.IndexOf("Ramp", System.StringComparison.OrdinalIgnoreCase) < 0 &&
+               hierarchyName.IndexOf("StartingZone", System.StringComparison.OrdinalIgnoreCase) < 0 &&
+               hierarchyName.IndexOf("Stronghold", System.StringComparison.OrdinalIgnoreCase) < 0 &&
+               hierarchyName.IndexOf("High_Ground", System.StringComparison.OrdinalIgnoreCase) < 0 &&
+               hierarchyName.IndexOf("Giant_Arena", System.StringComparison.OrdinalIgnoreCase) < 0;
     }
 
     private static void AddGiantMarker(Transform giant)

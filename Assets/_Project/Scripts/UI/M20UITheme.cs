@@ -159,30 +159,35 @@ public static class M20UITheme
     {
         Transform joystickRoot = safe.Find("MobileControls/JoystickBackground");
         if (joystickRoot == null) return;
-        SetRect((RectTransform)joystickRoot, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(34f, 34f), new Vector2(204f, 204f));
+        // Landscape thumbs sit comfortably above and away from the device edge.
+        // Keep the full target area inside the safe area so a system gesture or
+        // case lip cannot compete with the movement touch.
+        SetRect((RectTransform)joystickRoot, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(128f, 116f), new Vector2(280f, 280f));
         Image baseImage = joystickRoot.GetComponent<Image>();
         StyleImage(baseImage, Sprite("CircleRing"), new Color(0.08f, 0.09f, 0.11f, 0.48f));
         // This Graphic is the pointer surface for VirtualJoystick. StyleImage
         // disables raycasts for decorative images, so restore it here only.
         baseImage.raycastTarget = true;
         Transform handle = joystickRoot.Find("JoystickHandle");
-        SetRect((RectTransform)handle, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.zero, new Vector2(82f, 82f));
+        SetRect((RectTransform)handle, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.zero, new Vector2(108f, 108f));
         Image handleImage = handle.GetComponent<Image>();
         StyleImage(handleImage, Sprite("CircleFill"), new Color(0.78f, 0.80f, 0.82f, 0.72f));
         handleImage.raycastTarget = false;
         JoystickVisualFeedback feedback = GetOrAdd<JoystickVisualFeedback>(joystickRoot.gameObject);
-        feedback.Configure(joystickRoot.GetComponent<VirtualJoystick>(), baseImage, handleImage);
+        VirtualJoystick joystick = joystickRoot.GetComponent<VirtualJoystick>();
+        joystick?.ConfigureRadius(86f);
+        feedback.Configure(joystick, baseImage, handleImage);
     }
 
     private static void ConfigureActions(Transform safe)
     {
         Transform actions = safe.Find("ActionControls");
         if (actions == null) return;
-        SetRect((RectTransform)actions, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-26f, 26f), new Vector2(450f, 292f));
-        ConfigureActionButton(actions.Find("FireButton"), "Fire", Red, new Vector2(288f, 0f), 150f, string.Empty);
-        ConfigureActionButton(actions.Find("GrenadeButton"), "Grenade", OrangeRed, new Vector2(96f, 18f), 115f, string.Empty);
-        ConfigureActionButton(actions.Find("ReloadButton"), "Reload", new Color(0.12f, 0.15f, 0.17f, 0.9f), new Vector2(208f, 145f), 100f, string.Empty);
-        ConfigureActionButton(actions.Find("SwitchButton"), "SwitchWeapon", new Color(0.12f, 0.15f, 0.17f, 0.9f), new Vector2(326f, 182f), 100f, string.Empty);
+        SetRect((RectTransform)actions, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-86f, 70f), new Vector2(520f, 348f));
+        ConfigureActionButton(actions.Find("FireButton"), "Fire", Red, new Vector2(326f, 0f), 172f, string.Empty);
+        ConfigureActionButton(actions.Find("GrenadeButton"), "Grenade", OrangeRed, new Vector2(102f, 20f), 134f, string.Empty);
+        ConfigureActionButton(actions.Find("ReloadButton"), "Reload", new Color(0.12f, 0.15f, 0.17f, 0.9f), new Vector2(202f, 164f), 114f, string.Empty);
+        ConfigureActionButton(actions.Find("SwitchButton"), "SwitchWeapon", new Color(0.12f, 0.15f, 0.17f, 0.9f), new Vector2(356f, 206f), 114f, string.Empty);
 
         PlayerGrenadeController grenades = UnityEngine.Object.FindFirstObjectByType<PlayerGrenadeController>();
         Transform grenadeTransform = actions.Find("GrenadeButton");

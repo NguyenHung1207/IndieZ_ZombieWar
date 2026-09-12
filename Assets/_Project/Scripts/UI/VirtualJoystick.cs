@@ -14,6 +14,14 @@ public sealed class VirtualJoystick : MonoBehaviour, IPointerDownHandler, IDragH
     public Vector2 Value => value;
     public bool IsDragging => pointerId != int.MinValue;
 
+    // The usable travel radius is deliberately smaller than the visual base so
+    // the handle stays inside its ring at full deflection.
+    public void ConfigureRadius(float travelRadius)
+    {
+        radius = Mathf.Max(1f, travelRadius);
+        UpdateHandle();
+    }
+
     private void Awake()
     {
         rectTransform = (RectTransform)transform;
@@ -35,6 +43,12 @@ public sealed class VirtualJoystick : MonoBehaviour, IPointerDownHandler, IDragH
     {
         if (GameSession.Instance != null && !GameSession.Instance.IsPlaying)
             return;
+
+        // A second finger landing on the joystick must not take ownership from
+        // the finger already driving movement.
+        if (IsDragging)
+            return;
+
         pointerId = eventData.pointerId;
         UpdateValue(eventData);
     }

@@ -100,7 +100,10 @@ public sealed class PlayerWeaponController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
             Reload();
 
-        SetDesktopFireHeld(Input.GetMouseButton(0));
+        // Unity maps the first touchscreen contact to mouse button 0.  Without
+        // this platform gate, simply holding the movement joystick fires the
+        // equipped weapon on Android.
+        SetDesktopFireHeld(!Application.isMobilePlatform && Input.GetMouseButton(0));
         WeaponDefinition definition = EquippedWeapon;
         if (!fireHeld || definition == null)
         {
