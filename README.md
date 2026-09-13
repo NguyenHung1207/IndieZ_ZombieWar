@@ -1,21 +1,18 @@
 # ZOMBIE WAR
 
-Zombie War is a top-down survival shooter for desktop and landscape Android. Survive three-minute runs across two distinct battlefields, defeat zombie hordes, collect loot and coins, and manage a persistent two-slot weapon loadout.
+Zombie War is a top-down zombie survival shooter for Android landscape and desktop testing. Survive two three-minute levels, collect loot and coins, and build a persistent two-slot weapon loadout.
 
 ## Features
 
-- Two 3-minute survival levels with Victory and Game Over
+- Level 1: flat infinite/recycled military battlefield
+- Level 2: slope-based mutant stronghold
 - Cinemachine top-down camera
-- Level 1: flat, infinite recycled battlefield
-- Level 2: slope-based stronghold battlefield with a Giant Zombie encounter
-- Five weapons with persistent Shop and two-slot loadout
-- Coins, loot drops, ammo, reload, recoil, muzzle VFX, tracers, and spatial audio
-- 360-degree automatic target aiming
-- Physics grenade with explosion damage, knockback, and cooldown
-- Multiple zombie variants, including Male, Fat, and Giant Zombie enemies
-- NavMesh Zombie chase/attack behavior with hit, death, dissolve, VFX, and audio
-- Safe Area-aware mobile joystick plus Fire, Reload, Switch, Grenade, and Pause controls
-- Main Menu, Level Select, Shop, Settings, Pause, Victory, and Game Over flows
+- Five weapons, a persistent two-slot loadout, and weapon Shop
+- Coins and loot; ammo, reload, recoil, tracers, VFX, and audio
+- 360-degree automatic targeting and a physics grenade
+- Normal, Male, Fat, and Giant Zombie variants with NavMesh chase, attack, death, and dissolve behavior
+- Mobile joystick and action buttons
+- Main Menu, Level Select, Shop, Settings, Pause, Victory, and Game Over
 
 ## Controls
 
@@ -24,46 +21,34 @@ Zombie War is a top-down survival shooter for desktop and landscape Android. Sur
 - WASD — Move
 - Mouse0 — Fire
 - R — Reload
-- Q — Switch weapon
-- G — Throw grenade
+- Q — Switch
+- G — Grenade
 - Escape — Pause
 
 ### Mobile
 
 - Joystick — Move
-- Fire — Fire
-- Reload — Reload
-- Switch — Switch weapon
-- Grenade — Throw grenade
-- Pause — Pause
+- Fire
+- Reload
+- Switch
+- Grenade
+- Pause
 
 ## Build
 
-Use Unity `6000.3.15f1` with:
+Unity `6000.3.15f1`
 
-- Android Build Support
-- Android SDK & NDK Tools
-- OpenJDK
+Android release settings:
 
-The release build command is:
+- IL2CPP
+- ARM64
+- Landscape
+- `com.indiez.zombiewar`
+- Version `1.0.0` / code `1`
 
-`Build > Zombie War > Build Android APK`
+Build menu: `Build > Zombie War > Build Android APK`
 
-Output:
-
-`Builds/Android/ZombieWar.apk`
-
-Release configuration:
-
-- Application ID: `com.indiez.zombiewar`
-- Version: `1.0.0`
-- Version Code: `1`
-- Scripting Backend: IL2CPP
-- Architecture: ARM64
-- Orientation: Landscape only
-- Development Build: Disabled
-- Script Debugging: Disabled
-- Autoconnect Profiler: Disabled
+Output: `Builds/Android/ZombieWar.apk`
 
 ## Production Scenes
 
@@ -73,6 +58,4 @@ Release configuration:
 
 ## Third-Party Assets
 
-Third-party production dependencies and their sources are documented in:
-
-[THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md)
+See [THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md).

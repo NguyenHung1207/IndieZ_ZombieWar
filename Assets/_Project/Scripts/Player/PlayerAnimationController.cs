@@ -10,12 +10,10 @@ public sealed class PlayerAnimationController : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField, Min(0f)] private float parameterDampTime = 0.1f;
 
-    private CharacterController characterController;
     private PlayerMovement playerMovement;
 
     private void Awake()
     {
-        characterController = GetComponent<CharacterController>();
         playerMovement = GetComponent<PlayerMovement>();
 
         if (animator == null)
@@ -31,20 +29,14 @@ public sealed class PlayerAnimationController : MonoBehaviour
 
     private void Update()
     {
-        if (animator == null || characterController == null || playerMovement == null)
+        if (animator == null || playerMovement == null)
         {
             return;
         }
 
-        Vector3 horizontalVelocity = new Vector3(
-            characterController.velocity.x,
-            0f,
-            characterController.velocity.z);
-
-        float normalizedSpeed = playerMovement.MoveSpeed > 0f
-            ? horizontalVelocity.magnitude / playerMovement.MoveSpeed
-            : 0f;
-        normalizedSpeed = Mathf.Clamp01(normalizedSpeed);
+        // Animation follows the requested input only; it never supplies motion
+        // to the CharacterController.
+        float normalizedSpeed = playerMovement.MoveInputMagnitude;
 
         animator.SetFloat(
             MoveSpeedHash,

@@ -9,6 +9,7 @@ public sealed class VirtualJoystick : MonoBehaviour, IPointerDownHandler, IDragH
 
     private RectTransform rectTransform;
     private int pointerId = int.MinValue;
+    private Vector2 touchOrigin;
     private Vector2 value;
 
     public Vector2 Value => value;
@@ -49,8 +50,15 @@ public sealed class VirtualJoystick : MonoBehaviour, IPointerDownHandler, IDragH
         if (IsDragging)
             return;
 
+        // A touch can land anywhere within the visual base. Treat that point as
+        // this touch's neutral origin so merely touching the joystick never
+        // produces movement.
+        if (!TryGetLocalPoint(eventData, out touchOrigin))
+            return;
+
         pointerId = eventData.pointerId;
-        UpdateValue(eventData);
+        value = Vector2.zero;
+        UpdateHandle();
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -68,18 +76,38 @@ public sealed class VirtualJoystick : MonoBehaviour, IPointerDownHandler, IDragH
     public void ResetInput()
     {
         pointerId = int.MinValue;
+        touchOrigin = Vector2.zero;
         value = Vector2.zero;
         UpdateHandle();
     }
 
     private void UpdateValue(PointerEventData eventData)
     {
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                rectTransform, eventData.position, eventData.pressEventCamera, out Vector2 localPoint))
+        if (!TryGetLocalPoint(eventData, out Vector2 localPoint))
             return;
-        Vector2 normalized = Vector2.ClampMagnitude(localPoint / radius, 1f);
-        value = normalized.magnitude >= deadZone ? normalized : Vector2.zero;
+
+        Vector2 delta = Vector2.ClampMagnitude(localPoint - touchOrigin, radius);
+        float normalizedMagnitude = delta.magnitude / radius;
+        if (normalizedMagnitude <= deadZone)
+        {
+            value = Vector2.zero;
+        }
+        else
+        {
+            // Remove the dead zone before normalizing the direction, then map
+            // the remaining travel back to the full analog range.
+            float analogMagnitude = (normalizedMagnitude - deadZone) / (1f - deadZone);
+            value = delta.normalized * analogMagnitude;
+        }
         UpdateHandle();
+    }
+
+    private bool TryGetLocalPoint(PointerEventData eventData, out Vector2 localPoint)
+    {
+        // pressEventCamera is the camera that owns this pointer's UI press;
+        // it is correctly null for Screen Space Overlay canvases.
+        return RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            rectTransform, eventData.position, eventData.pressEventCamera, out localPoint);
     }
 
     private void UpdateHandle()

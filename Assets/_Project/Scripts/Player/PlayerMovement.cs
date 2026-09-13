@@ -8,6 +8,7 @@ public sealed class PlayerMovement : MonoBehaviour
     [SerializeField] private VirtualJoystick mobileJoystick;
 
     public float MoveSpeed => moveSpeed;
+    public float MoveInputMagnitude { get; private set; }
 
     private CharacterController characterController;
     private float verticalVelocity;
@@ -28,13 +29,22 @@ public sealed class PlayerMovement : MonoBehaviour
     private void Update()
     {
         if (GameSession.Instance != null && !GameSession.Instance.IsPlaying)
+        {
+            MoveInputMagnitude = 0f;
             return;
+        }
         Vector2 desktopInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         Vector2 selectedInput = mobileJoystick != null && mobileJoystick.IsDragging
             ? mobileJoystick.Value
             : externalInputActive ? externalMoveInput : desktopInput;
-        Vector3 input = new Vector3(selectedInput.x, 0f, selectedInput.y);
-        Vector3 moveDirection = Vector3.ClampMagnitude(input, 1f);
+        // Keep the analog magnitude for translation, but use a unit vector for
+        // facing so rotation can never reduce the requested move speed.
+        float inputMagnitude = selectedInput.magnitude;
+        float moveMagnitude = Mathf.Clamp01(inputMagnitude);
+        MoveInputMagnitude = moveMagnitude;
+        Vector3 moveDirection = inputMagnitude > 0f
+            ? new Vector3(selectedInput.x / inputMagnitude, 0f, selectedInput.y / inputMagnitude)
+            : Vector3.zero;
 
         if (moveDirection.sqrMagnitude > 0f)
         {
@@ -54,7 +64,7 @@ public sealed class PlayerMovement : MonoBehaviour
             verticalVelocity += Physics.gravity.y * Time.deltaTime;
         }
 
-        Vector3 velocity = moveDirection * moveSpeed;
+        Vector3 velocity = moveDirection * (moveSpeed * moveMagnitude);
         velocity.y = verticalVelocity;
         characterController.Move(velocity * Time.deltaTime);
     }
